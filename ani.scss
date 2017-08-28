@@ -1,0 +1,17 @@
+@mixin ani($args...) {
+  $name: unique-id();
+  @keyframes #{$name} {
+    @content;
+  }
+  animation: $name $args;
+}
+
+// example
+// div {
+//   @include ani(1s ease infinite) {
+//     100% {
+//       left: 0;
+//     }
+//   }
+// }
+

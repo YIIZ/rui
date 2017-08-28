@@ -20,6 +20,15 @@ export function $(selector) {
 export function $1(selector) {
   return document.querySelector(selector)
 }
+export const $0 = $1
+
+export function find(el, selector) {
+  return toArray(el.querySelectorAll(selector))
+}
+
+export function findOne(el, selector) {
+  return el.querySelector(selector)
+}
 
 export function closest(el, selector) {
   let parent = el

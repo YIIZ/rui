@@ -15,7 +15,7 @@ export function once(element, eventName, handler) {
   })
 }
 
-// https://github.com/rails/rails/blob/master/actionview/app/assets/javascripts/rails-ujs/utils/event.coffee#L34
+// https://github.com/rails/rails/blob/11341fd/actionview/app/assets/javascripts/rails-ujs/utils/event.coffee#L34
 export function delegate(element, selector, eventType, handler) {
   on(element, eventType, function (e) {
     var target
@@ -31,4 +31,25 @@ export function delegate(element, selector, eventType, handler) {
 }
 export function live(selector, eventType, handler) {
   delegate(document, selector, eventType, handler)
+}
+
+
+let CustomEvent = window.CustomEvent
+if (typeof CustomEvent !== 'function') {
+  CustomEvent = (name, params) => {
+    const event = document.createEvent('CustomEvent')
+    event.initCustomEvent(name, params.bubbles, params.cancelable, params.detail)
+    return event
+  }
+  CustomEvent.prototype = window.Event.prototype
+}
+
+export const fire = function(el, name, data) {
+  const event = new CustomEvent(name, {
+    bubbles: true,
+    cancelable: true,
+    detail: data,
+  })
+  el.dispatchEvent(event)
+  return !event.defaultPrevented
 }
