@@ -53,3 +53,18 @@ export const fire = function(el, name, data) {
   el.dispatchEvent(event)
   return !event.defaultPrevented
 }
+
+
+// extras
+export function onceAny(element, eventNamesString, handler) {
+  const eventNames = eventNamesString.split(/\s+/)
+  function fn(evt) {
+    eventNames.forEach(eventName => {
+      off(element, eventName, fn)
+    })
+    handler.call(this, evt)
+  }
+  eventNames.forEach(eventName => {
+    on(element, eventName, fn)
+  })
+}
