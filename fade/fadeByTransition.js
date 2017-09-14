@@ -15,6 +15,7 @@ export const fadeIn = el => {
   el.classList.add('in')
 }
 export const fade = el => {
+  if (!el.classList.contains('in')) return
   if (SUPPORTED) {
     el.classList.add('transiting')
   }
