@@ -13,23 +13,6 @@ export function toArray(elements) {
   return Array.prototype.slice.call(elements)
 }
 
-export function $(selector) {
-  return toArray(document.querySelectorAll(selector))
-}
-
-export function $1(selector) {
-  return document.querySelector(selector)
-}
-export const $0 = $1
-
-export function find(el, selector) {
-  return toArray(el.querySelectorAll(selector))
-}
-
-export function findOne(el, selector) {
-  return el.querySelector(selector)
-}
-
 export function closest(el, selector) {
   let parent = el
   while (parent = parent.parentNode) {
@@ -38,3 +21,11 @@ export function closest(el, selector) {
     }
   }
 }
+
+export function find(selector, el = document) {
+  return toArray(el.querySelectorAll(selector))
+}
+export function findOne(selector, el = document) {
+  return el.querySelector(selector)
+}
+
