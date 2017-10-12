@@ -14,14 +14,15 @@ export function toArray(elements) {
 }
 
 export function closest(el, selector) {
-  let parent = el
-  while (parent = parent.parentNode) {
-    if (matches(parent, selector)) {
-      return parent
-    }
+  if (matches(el, selector)) {
+    return el
+  } else if (el.parentNode) {
+    return closest(el.parentNode, selector)
   }
 }
 
+// ? document.querySelector el.querySelector 貌似也差不多？
+// pros 利于压缩/可更换实现/自带toArray cons 不直观
 export function find(selector, el = document) {
   return toArray(el.querySelectorAll(selector))
 }
