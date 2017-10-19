@@ -1,3 +1,4 @@
+// TODO multiple? animation: fade 1s, visible 1s step-end
 @mixin ani($args...) {
   $name: unique-id();
   @keyframes #{$name} {
