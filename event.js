@@ -23,7 +23,7 @@ export function delegate(element, selector, eventType, handler) {
     while (!(!(target instanceof Element) || matches(target, selector))) {
       target = target.parentNode
     }
-    if (target instanceof Element && handler.call(target, e) === false) {
+    if (target instanceof Element && handler.call(target, e, target) === false) {
       e.preventDefault()
       return e.stopPropagation()
     }
