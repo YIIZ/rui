@@ -2,6 +2,10 @@ import { matches } from './dom'
 
 export function on(element, eventName, handler) {
   element.addEventListener(eventName, handler, false)
+
+  return () => {
+    element.removeEventListener(eventName, handler, false)
+  }
 }
 
 export function off(element, eventName, handler) {
