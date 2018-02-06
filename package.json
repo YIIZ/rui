@@ -3,5 +3,8 @@
   "version": "0.0.0",
   "main": "index.js",
   "author": "Bin Xin <rhyzix@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "image-size": "^0.6.2"
+  }
 }
