@@ -5,6 +5,7 @@
   "author": "Bin Xin <rhyzix@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "image-size": "^0.6.2"
+    "image-size": "^0.6.2",
+    "intrinsic-scale": "^3.0.3"
   }
 }
