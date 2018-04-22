@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server -d",
+    "start": "webpack-dev-server -d --devtool cheap-source-map --hot",
     "build": "webpack -p --progress --hide-modules",
     "buildc": "rimraf dist/* & yarn build"
   },
