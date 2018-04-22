@@ -1,4 +1,5 @@
 /** @jsx x */
+
 import compute from 'compute-js'
 window.compute = compute
 
@@ -22,9 +23,9 @@ const getAndWatch = (value, callback) => {
 
 
 const x = (name, attributes, ...children) => {
+  if (typeof name === 'function') return name(attributes, children)
   const el = document.createElement(name)
 
-  console.log(attributes)
   if (attributes !== null)
   for (const [key, value] of Object.entries(attributes)) {
     // TODO props(by adapter?)
@@ -123,6 +124,12 @@ const fullName = compute(() => `${firstName()} ${lastName()}`)
 
 const clickCount = compute.value(0)
 
+
+const Foo = ({ name }, children) =>
+  <div>
+    this is foo: {name}
+  </div>
+
 const out = <div>
   <h1 title={fullName}>{firstName}</h1>
   <h2>{fullName}</h2>
@@ -134,17 +141,12 @@ const out = <div>
     {x.each(items, (item) =>
       <li>{item}</li>
     )}
+    {compute(() => items().map((item) => <li>{item} by compute</li>))}
     <li>last</li>
   </ul>
   <span hidden>s</span>
   <button type="button" onclick={() => clickCount.set(clickCount() + 1)}>Click Me! {clickCount}</button>
+  <Foo name={fullName}></Foo>
 </div>
 
 document.body.appendChild(out)
-
-class Foo {
-  get name() {
-    return '123'
-  }
-}
-window.foo = new Foo

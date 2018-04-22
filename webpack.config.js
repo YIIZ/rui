@@ -46,5 +46,10 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
+    new webpack.ProvidePlugin({
+      // Components: 'components/index.js', ?
+      'Components.Foo': 'components/Foo.js',
+      'Components.Bar': 'components/Bar.js',
+    }),
   ],
 }
