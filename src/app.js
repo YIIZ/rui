@@ -21,6 +21,15 @@ const getAndWatch = (value, callback) => {
   return () => value.offChange(handle)
 }
 
+const fire = (el, name, data) => {
+  const event = new CustomEvent(name, {
+    bubbles: false,
+    cancelable: false,
+  })
+  el.dispatchEvent(event)
+}
+
+
 
 const x = (name, attributes, ...children) => {
   if (typeof name === 'function') return name(attributes, children)
@@ -33,6 +42,10 @@ const x = (name, attributes, ...children) => {
       // once?
       const eventName = key.slice(2)
       el.addEventListener(eventName, value, false)
+
+      if (eventName === 'detach') {
+        el.classList.add('hasdetach')
+      }
     } else {
       const set = v => {
         if (typeof v === 'boolean') {
@@ -68,6 +81,10 @@ const x = (name, attributes, ...children) => {
         // node by replaceChild
         for (const node of nodes) {
           el.removeChild(node)
+          if (node.querySelectorAll)
+          for (const detachedNode of node.querySelectorAll('.hasdetach')) {
+            fire(detachedNode, 'detach')
+          }
         }
         nodes = newNodes
         for (const node of nodes) {
@@ -86,6 +103,7 @@ const x = (name, attributes, ...children) => {
 
 // TODO normal value
 const noop = () => {}
+// TODO compute should not include truthy()
 x.if = (value, truthy, falsy=noop) => compute(() => value() ? truthy() : falsy())
 // TODO cache and reuse
 x.each = (items, mapper, empty=noop) => compute(() => items().map(mapper))
@@ -125,16 +143,32 @@ const fullName = compute(() => `${firstName()} ${lastName()}`)
 const clickCount = compute.value(0)
 
 
-const Foo = ({ name }, children) =>
-  <div>
-    this is foo: {name}
+const Foo = ({ name }, children) => {
+  const time = compute.value(new Date)
+  const interval = setInterval(() => {
+    console.log(`update time ${Date.now()}`)
+    time.set(new Date)
+  }, 5000)
+
+  const detach = () => {
+    console.log('detached')
+    clearInterval(interval)
+  }
+
+  return <div ondetach={detach}>
+    <div>this is foo: {name}</div>
+    <div>time is {time}</div>
   </div>
+}
 
 const out = <div>
   <h1 title={fullName}>{firstName}</h1>
   <h2>{fullName}</h2>
   {x.if(isOk, () =>
-    <div>ok</div>
+    <div>
+      <div>ok</div>
+      <Foo name={fullName}></Foo>
+    </div>
   )}
   <ul onclick="console.log(2)">
     {[<li>first</li>, <li>second</li>]}
@@ -146,7 +180,6 @@ const out = <div>
   </ul>
   <span hidden>s</span>
   <button type="button" onclick={() => clickCount.set(clickCount() + 1)}>Click Me! {clickCount}</button>
-  <Foo name={fullName}></Foo>
 </div>
 
 document.body.appendChild(out)
