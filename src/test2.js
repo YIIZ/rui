@@ -42,18 +42,11 @@ const Element = ({ tag, ...props }, ...children) => {
 // TODO children spread
 const Image = (props) => <Element {...props} tag="img"></Element>
 const Scene = (props, ...children) =>
-  <Element {...props} tag="div">
-    {children[0]}
-    {children[1]}
-  </Element>
+  <Element {...props} tag="div">{...children}</Element>
 
 
 // custom components
-const Album = (props, ...children) =>
-  <Scene>
-    {children[0]}
-    {children[1]}
-  </Scene>
+const Album = (props, ...children) => <Scene>{...children}</Scene>
 const Photo = ({ size=300, color='DDD' }={}) => {
   const src = compute(() => `//via.placeholder.com/${get(size)}/${get(color)}`)
   return <Image src={src}></Image>
