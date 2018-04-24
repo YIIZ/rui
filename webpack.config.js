@@ -1,6 +1,8 @@
 const PROD = process.argv.includes('-p')
 const webpack = require('webpack')
 
+const jsx = require('./jsx')
+
 module.exports = {
   context: `${__dirname}/src`,
   resolve: {
@@ -29,7 +31,8 @@ module.exports = {
           plugins: [
             'transform-runtime',
             'transform-object-rest-spread',
-            'transform-react-jsx'/*, { pragma: 'x' }*/,
+            // 'transform-react-jsx'/*, { pragma: 'x' }*/,
+            jsx,
             ['transform-class-properties', { spec: true }],
           ],
         },
