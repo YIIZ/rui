@@ -1,3 +1,4 @@
+// todo transform-jsx-functional
 const jsx = require('babel-plugin-transform-react-jsx')
 
 module.exports = ({ types: t }) => {
