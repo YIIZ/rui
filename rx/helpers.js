@@ -4,11 +4,11 @@
 const take = (source, n) =>
   new Observable(observer => {
     let remain = n
-    const unsubscribe = source.subscribe({
+    return source.subscribe({
       next(value) {
         remain -= 1
-        observer.next(value)
         if (remain < 1) observer.complete()
+        else observer.next(value)
       },
       error(e) {
         observer.error(e)
@@ -17,7 +17,6 @@ const take = (source, n) =>
         observer.complete()
       },
     })
-    return unsubscribe
   })
 
 export { take }
