@@ -40,3 +40,5 @@ if (supportPassive) {
 https://github.com/WICG/EventListenerOptions/blob/gh-pages/EventListenerOptions.polyfill.js
 https://github.com/zzarcon/default-passive-events
 https://www.html5rocks.com/en/tutorials/speed/animations/#debouncing-scroll-events
+
+### Refactor
