@@ -19,6 +19,11 @@ export const listen = (element, eventName) => {
   })
 }
 
+// or?
+// combineLatest(
+//   listen(el, 'mousedown'),
+//   listen(el, 'touchstart')
+// ) |> take(1)
 export const listenOnce = (...args) => listen(...args) |> take(1)
 // listenActive (opposite to passive)
 // listenPreventDefault
