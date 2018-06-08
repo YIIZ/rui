@@ -1,11 +1,11 @@
 // ideas
 // - default passive
-import { take } from './helpers'
+import { take } from './index'
 
 // export const once
 export const listen = (element, eventName) => {
   const eventNames = eventName.split(/\s+/)
-  new Observable(observer => {
+  return new Observable(observer => {
     const handler = event => observer.next(event)
 
     for (const name of eventNames) {
@@ -19,4 +19,6 @@ export const listen = (element, eventName) => {
   })
 }
 
-export const listenOnce = (...args) => take(listen(...args), 1)
+export const listenOnce = (...args) => listen(...args) |> take(1)
+// listenActive (opposite to passive)
+// listenPreventDefault
