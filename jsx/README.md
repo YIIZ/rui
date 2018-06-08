@@ -1,1 +1,1 @@
-`babel-plugin-transform-function-jsx` required
+require: `babel-plugin-transform-function-jsx`

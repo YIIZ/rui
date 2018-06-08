@@ -1,4 +1,6 @@
-Utils based on [Observable](https://github.com/tc39/proposal-observable)(babel-plugin-transform-runtime)
+Utils based on [Observable](https://github.com/tc39/proposal-observable)
+
+require: [babel-plugin-transform-runtime](https://github.com/babel/babel/blob/9f4e2f/packages/babel-plugin-transform-runtime/src/definitions.js#L9)
 
 
 ## Tips
