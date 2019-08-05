@@ -1,11 +1,10 @@
-const PROD = process.argv.includes('-p')
+const path = require('path')
 const webpack = require('webpack')
-
-const jsx = require('./jsx')
 
 module.exports = {
   context: `${__dirname}/src`,
   resolve: {
+    symlinks: false,
     modules: ['src', 'node_modules'],
   },
   entry: {
@@ -19,40 +18,42 @@ module.exports = {
   module: {
     rules: [{
       test: /\.js$/,
-      // exclude: /node_modules/,
-      exclude: /node_modules\/(?!lib)/,
-      // use: ['babel-loader'],
+      include: [
+        path.resolve(__dirname, 'src'),
+      ],
       use: {
         loader: 'babel-loader',
         options: {
           // ignore babelrc in node_modules
           babelrc: false,
-          presets: [ ['env', { modules: false }] ],
+          presets: [ ['@babel/preset-env', { modules: false }] ],
           plugins: [
-            'transform-runtime',
-            'transform-object-rest-spread',
-            // 'transform-react-jsx'/*, { pragma: 'x' }*/,
-            ['transform-class-properties', { spec: true }],
-            jsx,
+            ['@babel/plugin-transform-runtime', { corejs: { version: 3, proposals: true }, useESModules: true }],
+            '@babel/plugin-syntax-dynamic-import',
+            '@babel/plugin-proposal-class-properties',
+            ['@babel/plugin-proposal-decorators', { decoratorsBeforeExport: false }],
+            '@babel/plugin-proposal-do-expressions',
+            '@babel/plugin-proposal-logical-assignment-operators',
+            '@babel/plugin-proposal-nullish-coalescing-operator',
+            '@babel/plugin-proposal-optional-chaining',
+            '@babel/plugin-proposal-partial-application',
+            ['@babel/plugin-proposal-pipeline-operator', { proposal: 'minimal' }],
+            'babel-plugin-transform-functional-jsx',
           ],
         },
       },
     }, {
-      test: /\.(png|jpg|gif|mp4|mp3|m4a)$/,
+      test: path.resolve(__dirname, 'res'),
+      type: 'javascript/auto', // fix json type
       loader: 'file-loader',
       options: {
-        name: 'assets/[name]-[hash:8].[ext]',
+        name: '[name]-[hash:8].[ext]',
       },
     }],
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
-    }),
-    new webpack.ProvidePlugin({
-      // Components: 'components/index.js', ?
-      'Components.Foo': 'components/Foo.js',
-      'Components.Bar': 'components/Bar.js',
     }),
   ],
 }
