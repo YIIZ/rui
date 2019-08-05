@@ -1,3 +1,5 @@
+const EventEmitter = require('eventemitter3')
+
 const getAndWatch = (value, callback) => {
   if (typeof value !== 'function') return callback(value)
   const handle = () => callback(value())
@@ -9,6 +11,22 @@ const getAndWatch = (value, callback) => {
 const get = (value) => typeof value === 'function' ? value() : value
 
 
+// class Component {
+//   attached = false
+//   constructor(props, ...children) {
+//     this.append(...children)
+//   }
+
+//   append(...children) {
+//     for (const child of children) {
+//       if (child instanceof Fragment) {
+//         this.append(...child.children)
+//       } else if (child instanceof Component) {
+//         this.append(child)
+//       }
+//     }
+//   }
+// }
 
 class Component {
   attached = false
@@ -58,6 +76,22 @@ class Component {
   }
 }
 
+class Anchor extends EventEmitter {
+  before(...args) {
+    this.emit('before', ...args)
+  }
+  remove(...args) {
+    this.emit('remove', ...args)
+  }
+}
+class AnchorWrapper {
+  constructor(anchor) {
+    anchor.on('before', this.before, this)
+    anchor.on('remove', this.remove, this)
+  }
+  before() {}
+  remove() {}
+}
 
 class State extends Component {
   constructor({ attached, detached, ...props }, children) {
@@ -79,11 +113,34 @@ class State extends Component {
   }
 }
 
-const createState = (props, ...children) => {
-  return new State(props, children)
+const createState = (props, ...children) => new State(props, children)
+const createAnchor = () => new Anchor()
+
+
+const when = (value, truthy) => {}
+const each = (items, mapper) => {
+  const anchor = <createAnchor/>
+  let children = items().map(mapper)
+
+  const update = () => {
+    const newChildren = items().map(mapper)
+    for (const child of children) {
+      child.remove()
+    }
+    anchor.before(...newChildren)
+    children = newChildren
+  }
+  const watch = () => {
+    items.onChange(update)
+  }
+  const unwatch = () => {
+    items.offChange(update)
+  }
+  return <createState attached={watch} detached={unwatch}>{...children}{anchor}</createState>
 }
 
-export { createState as State }
+
+export { createState as State, each, when }
 
 
 // html
@@ -117,15 +174,23 @@ class Element extends Component {
 
     if (child instanceof Element) {
       this.el.appendChild(child.el)
-    } else if (child instanceof Component) {
+    } else if (child instanceof Component/*Fragment?*/) {
       for (const cc of child.children) {
         this.append(cc)
       }
+    } else if (child instanceof Anchor) {
+      const anchor = document.createComment('')
+
+      child.on('before', anchor.before, anchor)
+      child.on('remove', anchor.remove, anchor)
+      this.el.appendChild(anchor)
     } else {
       const text = document.createTextNode('')
       getAndWatch(child, value => {
         text.data = value
       })
+      // TODO append support text
+      // https://developer.mozilla.org/en-US/docs/Web/API/ParentNode/append#Syntax
       this.el.appendChild(text)
     }
   }

@@ -1,9 +1,7 @@
-/** @jsx x */
-const x = (Component, props, ...children) => Component(props, ...children)
 const get = (value) => typeof value === 'function' ? value() : value
 
 
-import { Element, State } from 'rex'
+import { Element, State, when, each } from 'rex'
 import compute from 'compute-js'
 
 
@@ -46,6 +44,10 @@ const time = compute.value(new Date)
 window.color = color
 window.time = time
 
+const isOk = compute.value(true)
+const items = compute.value(['itemA', 'itemB'])
+window.isOk = isOk
+window.items = items
 
 const t = <Time></Time>
 const out =
@@ -56,7 +58,18 @@ const out =
     </Album>
     <Element tag="div">Nice {t}</Element>
     <Element tag="div">{t.props.time}</Element>
+    <Element tag="ul">
+      <Element tag="li">first</Element>
+      {each(items, (item) =>
+        <Element tag="li">{item}</Element>
+      )}
+      <Element tag="li">last</Element>
+    </Element>
   </Scene>
 
+// or
+// const root = <Root el={document.body}><Scene></Scene></Root>
+// or scene? app? main? https://github.com/HeapsIO/heaps/wiki/H2D-Concepts
+// /*root.attached = true*/
 out.attach(document.body)
 console.log(window.out = out)
