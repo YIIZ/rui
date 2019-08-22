@@ -8,5 +8,5 @@ const fullName = useCompute(() => `${name} gates`)
 
 window.setName = setName
 
-const node = <div>hello {fullName}!</div>
+const node = <div title={fullName}>hello {fullName}!</div>
 document.body.appendChild(node.el)
