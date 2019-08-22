@@ -1,10 +1,12 @@
 // @jsx h
-import { useState } from './core'
+import { useState, useCompute } from './core'
 import h from './html'
 
 const [name, setName] = useState('bill')
 
+const fullName = useCompute(() => `${name} gates`)
+
 window.setName = setName
 
-const node = <div>hello {name}!</div>
+const node = <div>hello {fullName}!</div>
 document.body.appendChild(node.el)

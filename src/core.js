@@ -13,8 +13,8 @@ export class Node {
 }
 
 class State {
-  constructor(inital) {
-    this.v = compute.value(inital)
+  constructor(v) {
+    this.v = v
   }
   valueOf() {
     return this.v()
@@ -30,7 +30,7 @@ class State {
 
 
 export function useState(inital) {
-  const state = new State(inital)
+  const state = new State(compute.value(inital))
   const set = (newValue) => state.v(newValue)
   return [state, set]
 }
@@ -39,4 +39,8 @@ export function watchState(state, callback) {
   if (state instanceof State) {
     state.watch(callback)
   }
+}
+
+export function useCompute(callback) {
+  return new State(compute(callback))
 }
