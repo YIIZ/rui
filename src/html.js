@@ -1,14 +1,20 @@
-import { Node } from './core'
+import { Node, useState, watchState } from './core'
+
+
+const createPrimitive = value => {
+  const primitive = document.createTextNode(value)
+  watchState(value, () => primitive.data = value)
+  return primitive
+}
+
+
 
 export const h = (name, props, ...children) => {
   if (typeof name === 'string') {
     const el = document.createElement(name)
 
     for (const child of children) {
-      const childEl = child instanceof Node
-        ? child.el
-        : document.createTextNode(child)
-
+      const childEl = child instanceof Node ? child.el : createPrimitive(child)
       el.appendChild(childEl)
     }
 
