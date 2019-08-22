@@ -26,7 +26,7 @@ module.exports = {
         options: {
           // ignore babelrc in node_modules
           babelrc: false,
-          presets: [ ['@babel/preset-env', { modules: false }] ],
+          presets: [ '@babel/preset-react', ['@babel/preset-env', { modules: false }] ],
           plugins: [
             ['@babel/plugin-transform-runtime', { corejs: { version: 3, proposals: true }, useESModules: true }],
             '@babel/plugin-syntax-dynamic-import',
@@ -38,7 +38,6 @@ module.exports = {
             '@babel/plugin-proposal-optional-chaining',
             '@babel/plugin-proposal-partial-application',
             ['@babel/plugin-proposal-pipeline-operator', { proposal: 'minimal' }],
-            'babel-plugin-transform-functional-jsx',
           ],
         },
       },
