@@ -17,17 +17,20 @@ export const h = (name, props, ...children) => {
   if (typeof name === 'string') {
     const el = document.createElement(name)
 
-    for (const [key, value] of Object.entries(props)) {
+    const { onAttached, ...otherProps } = props || {}
+    for (const [key, value] of Object.entries(otherProps)) {
       applyProp(el, key, value)
     }
 
     for (const child of children) {
-      const childEl = child instanceof Node ? child.el : createPrimitive(child)
+      // const childEl = child instanceof Node ? child.el : createPrimitive(child)
+      const childEl = child instanceof Element ? child : createPrimitive(child)
+      console.log(childEl, child, child.valueOf())
       el.appendChild(childEl)
     }
 
-    const node = new Node(el, children)
-    return node
+    // const node = new Node(el, children, onAttached)
+    return el
   } else {
     return name(h, props, ...children)
   }
