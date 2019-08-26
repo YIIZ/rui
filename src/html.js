@@ -1,5 +1,4 @@
-import * as rx from 'rxjs'
-import * as op from 'rxjs/operators'
+import { isObservable } from 'rxjs'
 import { watchState } from './core'
 
 const toNodes = (data) => {
@@ -17,7 +16,7 @@ export const h = (name, props, ...children) => {
 
     if (props)
     for (const [key, value] of Object.entries(props)) {
-      if (rx.isObservable(value)) {
+      if (isObservable(value)) {
         // el.setAttribute(key, value.value)
         watchState(value, (v) => el.setAttribute(key, v))
       } else {
@@ -26,7 +25,7 @@ export const h = (name, props, ...children) => {
     }
 
     for (const child of children) {
-      if (rx.isObservable(child)) {
+      if (isObservable(child)) {
         const anchor = document.createTextNode('')
         el.append(anchor)
 

@@ -1,12 +1,10 @@
-import compute from 'compute-js'
-import * as rx from 'rxjs'
-import * as op from 'rxjs/operators'
+import { BehaviorSubject, isObservable, combineLatest } from 'rxjs'
+import { map } from 'rxjs/operators'
 
-window.compute = compute
 
 // computes
 export function useState(inital) {
-  const state = new rx.BehaviorSubject(inital)
+  const state = new BehaviorSubject(inital)
   const set = (v) => state.next(v)
   return [ state, set ]
 }
@@ -23,8 +21,8 @@ export function watchState(state, callback) {
 }
 
 export function useCompute(callback, deps) {
-  const obs = deps.map(v => rx.isObservable(v) ? v : [v])
-  return rx.combineLatest(obs)
-    .pipe(op.map((values) => callback(...values)))
+  const obs = deps.map(v => isObservable(v) ? v : [v])
+  return combineLatest(obs)
+    .pipe(map((values) => callback(...values)))
     // cache
 }
