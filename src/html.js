@@ -1,3 +1,5 @@
+import * as rx from 'rxjs'
+import * as op from 'rxjs/operators'
 import { watchState } from './core'
 
 const toNodes = (data) => {
@@ -15,25 +17,26 @@ export const h = (name, props, ...children) => {
 
     if (props)
     for (const [key, value] of Object.entries(props)) {
-      if (typeof value === 'function') {
-        el.setAttribute(key, value())
-        watchState(value, () => el.setAttribute(key, value()))
+      if (rx.isObservable(value)) {
+        // el.setAttribute(key, value.value)
+        watchState(value, (v) => el.setAttribute(key, v))
       } else {
         el.setAttribute(key, value)
       }
     }
 
     for (const child of children) {
-      if (typeof child === 'function') {
+      if (rx.isObservable(child)) {
         const anchor = document.createTextNode('')
         el.append(anchor)
 
-        let nodes = toNodes(child())
-        anchor.after(...nodes)
+        // let nodes = toNodes(child())
+        // anchor.after(...nodes)
+        let nodes = []
         // use compute?
-        watchState(child, () => {
+        watchState(child, (v) => {
           nodes.forEach(el => el.remove())
-          nodes = toNodes(child())
+          nodes = toNodes(v)
           anchor.after(...nodes)
         })
       } else {

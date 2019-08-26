@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "webpack-dev-server --mode=development --devtool none --hot --history-api-fallback",
+    "start": "webpack-dev-server --mode=development --hot --history-api-fallback",
     "build": "webpack --mode=production --progress --hide-modules",
     "cleanup": "rimraf dist/*",
     "prebuild": "yarn cleanup"

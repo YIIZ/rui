@@ -1,49 +1,30 @@
 import compute from 'compute-js'
+import * as rx from 'rxjs'
+import * as op from 'rxjs/operators'
 
 window.compute = compute
 
-// export class Node {
-//   constructor(el, children, onAttached) {
-//     this.el = el
-//     this.children = children.filter(c => c instanceof Node)
-//     this._onAttached = onAttached
-//   }
-
-//   onAttached() {
-//     this._onDetached = this._onAttached?.()
-//     for (const child of this.children) {
-//       child.onAttached()
-//     }
-//   }
-//   onDetached() {
-//     this._onDetached?.()
-//     for (const child of this.children) {
-//       child.onDetached()
-//     }
-//   }
-// }
-
 // computes
 export function useState(inital) {
-  const state = compute.value(inital)
-  const { get, set } = state
-  // get has no watch hook
+  const state = new rx.BehaviorSubject(inital)
+  const set = (v) => state.next(v)
   return [ state, set ]
 }
 
-export const valueOf = (value) => typeof value === 'function' ? value() : value
-
 export function watchState(state, callback) {
-  if (state.onChange) {
-    state.onChange(callback)
+  if (state.subscribe) {
+    state.subscribe(callback)
   }
   return () => {
-    if (state.offChange) {
-      state.offChange(callback)
+    if (state.unsubscribe) {
+      state.unsubscribe(callback)
     }
   }
 }
 
-export function useCompute(callback) {
-  return compute(callback)
+export function useCompute(callback, deps) {
+  const obs = deps.map(v => rx.isObservable(v) ? v : [v])
+  return rx.combineLatest(obs)
+    .pipe(op.map((values) => callback(...values)))
+    // cache
 }

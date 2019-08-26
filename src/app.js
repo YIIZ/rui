@@ -5,8 +5,8 @@ import h from './html'
 function Time() {
   const [date, setDate] = useState(new Date())
 
-  const jsonTime = useCompute(() => date().toJSON())
-  const displayTime = useCompute(() => date().toLocaleString())
+  const jsonTime = useCompute((date) => date.toJSON(), [date])
+  const displayTime = useCompute((date) => date.toLocaleString(), [date])
 
   // useEffect
   setInterval(() => {
@@ -20,17 +20,17 @@ function App() {
   const [show, setShow] = useState(false)
 
   const [name, setName] = useState('gates')
-  const fullname = useCompute(() => `bill ${name()}`)
+  const fullname = useCompute((name) => `bill ${name}`, [name])
 
   window.setName = setName
   window.setShow = setShow
 
   return <div>
     <span>Hi {fullname}</span>
-    {useCompute(() => {
+    {useCompute((show) => {
       console.log('new time')
-      return show() ? <Time/> : null
-    })}
+      return show ? <Time/> : null
+    }, [show])}
   </div>
 }
 
