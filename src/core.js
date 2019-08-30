@@ -6,16 +6,17 @@ export class Node {
     this._attached = false
     this.el = el
     this.children = []
+    this.observables = []
     this.onAttached = onAttached
     this.onDetached = onDetached
   }
-
   attached() {
     this._attached = true
     for (const child of this.children) {
       child.attached()
     }
     this.onAttached && this.onAttached()
+    this.sub = combineLatest(this.observables).subscribe()
   }
   detached() {
     this._attached = false
@@ -23,6 +24,7 @@ export class Node {
       child.detached()
     }
     this.onDetached && this.onDetached()
+    this.sub.unsubscribe()
   }
 }
 
@@ -48,10 +50,11 @@ export const createBuilder = (options) => {
     const { onAttached, onDetached, ...otherProps } = props || {}
     const el = createElement(name)
     const node = new Node(el, onAttached, onDetached)
+    const watch = (ob, callback) => node.observables.push(ob.pipe(map(callback)))
 
     for (const [key, value] of Object.entries(otherProps)) {
       if (isObservable(value)) {
-        watchState(value, (v) => applyProp(el, key, v))
+        watch(value, (v) => applyProp(el, key, v))
       } else {
         applyProp(el, key, value)
       }
@@ -65,8 +68,7 @@ export const createBuilder = (options) => {
         node.children.push(anchorNode)
 
         let nodes = []
-        // watch after attached
-        watchState(child, (v) => {
+        watch(child, (v) => {
           const [newNodes, els] = toNodes(v)
           nodes.forEach(n => remove(el, n.el))
           after(el, anchor, ...els)
@@ -102,20 +104,9 @@ export function useState(inital) {
   return [ state, set ]
 }
 
-export function watchState(state, callback) {
-  if (state.subscribe) {
-    state.subscribe(callback)
-  }
-  return () => {
-    if (state.unsubscribe) {
-      state.unsubscribe(callback)
-    }
-  }
-}
-
 export function useCompute(callback, deps) {
   const obs = deps.map(v => isObservable(v) ? v : [v])
   return combineLatest(obs)
     .pipe(map((values) => callback(...values)))
-    // cache
+    // TODO cache
 }
