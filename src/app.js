@@ -9,12 +9,20 @@ function Time() {
   const displayTime = useCompute((date) => date.toLocaleString(), [date])
 
   // useEffect
-  setInterval(() => {
-    console.log('update time')
-    setDate(new Date())
-  }, 1000)
+  let t
+  const onAttached = () => {
+    console.log('attached')
+    t = setInterval(() => {
+      console.log('update time')
+      setDate(new Date())
+    }, 1000)
+  }
+  const onDetached = () => {
+    console.log('detached')
+    clearInterval(t)
+  }
 
-  return <time datetime={jsonTime}>{displayTime}</time>
+  return <time datetime={jsonTime} onAttached={onAttached} onDetached={onDetached}>{displayTime}</time>
 }
 
 function App() {
@@ -36,5 +44,6 @@ function App() {
 }
 
 const app = <App></App>
+app.attached()
 document.body.appendChild(app.el)
 
