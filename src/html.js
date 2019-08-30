@@ -1,40 +1,39 @@
 import { isObservable } from 'rxjs'
-import { watchState } from './core'
+import { Node, watchState } from './core'
 
-const toNodes = (data) => {
-  const array = Array.isArray(data) ? data
-    : (data === null || typeof data === 'undefined') ? []
-    : [data]
-
-  return array.map((v) => v instanceof Node ? v : document.createTextNode(v))
-}
-
-
-export const h = (name, props, ...children) => {
-  if (typeof name === 'string') {
+class DOMNode extends Node {
+  constructor(name, props, children) {
     const el = document.createElement(name)
+    super(el)
 
-    if (props)
-    for (const [key, value] of Object.entries(props)) {
+    const self = this
+    const toNodes = (data) => {
+      const array = Array.isArray(data) ? data
+        : (data === null || typeof data === 'undefined') ? []
+        : [data]
+
+      return array.map((v) => v instanceof Node ? v : new Node(this.createText(v)))
+        .map(n => n.el)
+    }
+
+    const { onAttached, onDetached, ...otherProps } = props || {}
+    for (const [key, value] of Object.entries(otherProps)) {
       if (isObservable(value)) {
-        // el.setAttribute(key, value.value)
-        watchState(value, (v) => el.setAttribute(key, v))
+        watchState(value, (v) => self.applyProp(el, key, v))
       } else {
-        el.setAttribute(key, value)
+        self.applyProp(el, key, value)
       }
     }
 
     for (const child of children) {
       if (isObservable(child)) {
-        const anchor = document.createTextNode('')
-        el.append(anchor)
+        const anchor = self.createAnchor()
+        self.append(el, anchor)
 
-        // let nodes = toNodes(child())
-        // anchor.after(...nodes)
         let nodes = []
         // use compute?
         watchState(child, (v) => {
-          nodes.forEach(el => el.remove())
+          nodes.forEach(n => self.remove(el, n))
           nodes = toNodes(v)
           anchor.after(...nodes)
         })
@@ -43,9 +42,34 @@ export const h = (name, props, ...children) => {
         el.append(...nodes)
       }
     }
-    return el
+  }
+
+  append(el, ...children) {
+    el.append(...children)
+  }
+  after(el, ref, ...children) {
+    ref.after(...children)
+  }
+  remove(el, target) {
+    target.remove()
+  }
+  applyProp(el, key, value) {
+    el.setAttribute(key, value)
+  }
+  createAnchor() {
+    return document.createTextNode('')
+  }
+  createText(text) {
+    return document.createTextNode(text)
+  }
+}
+
+
+export const h = (name, props, ...children) => {
+  if (typeof name === 'string') {
+    return new DOMNode(name, props, children)
   } else {
-    return name(h, props, ...children)
+    return name(h, props, children)
   }
 }
 export default h

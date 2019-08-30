@@ -34,3 +34,14 @@ useEffect(fn)
 
 ## TODO
 在 `useCompute(fn)` 里创建其他 Node 会导致该 compute 也依赖其中 Node 的依赖，这是不符合预期的
+
+
+## Slot
+```jsx
+<Modal>
+  <div></div>
+</Modal>
+```
+
+
+<Foo onAttached={fn}></Foo>?

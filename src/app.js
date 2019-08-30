@@ -10,6 +10,7 @@ function Time() {
 
   // useEffect
   setInterval(() => {
+    console.log('update time')
     setDate(new Date())
   }, 1000)
 
@@ -35,5 +36,5 @@ function App() {
 }
 
 const app = <App></App>
-document.body.appendChild(app)
+document.body.appendChild(app.el)
 
