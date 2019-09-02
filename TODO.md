@@ -1,3 +1,8 @@
+- computed cache
+- array performance(keys and reuse)
+- text performance
+
+
 ## 关于 Node 和原始数据的关系
 ```jsx
 const A = () => <div></div>

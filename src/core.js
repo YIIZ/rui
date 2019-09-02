@@ -1,5 +1,5 @@
 import { BehaviorSubject, isObservable, combineLatest } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, shareReplay } from 'rxjs/operators'
 
 export class Node {
   constructor(el, onAttached, onDetached) {
@@ -108,5 +108,5 @@ export function useCompute(callback, deps) {
   const obs = deps.map(v => isObservable(v) ? v : [v])
   return combineLatest(obs)
     .pipe(map((values) => callback(...values)))
-    // TODO cache
+    .pipe(shareReplay({ bufferSize: 1, refCount: true })) // cache value
 }

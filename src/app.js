@@ -40,6 +40,9 @@ function App() {
       console.log('new time')
       return show ? <Time/> : null
     }, [show])}
+    {useCompute((show) => {
+      return show ? <span>Hi {fullname}</span> : null
+    }, [show])}
   </div>
 }
 
