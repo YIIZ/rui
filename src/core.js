@@ -1,21 +1,18 @@
-import { BehaviorSubject, isObservable, combineLatest } from 'rxjs'
+import { Observable, BehaviorSubject, isObservable, combineLatest } from 'rxjs'
 import { map, shareReplay } from 'rxjs/operators'
 
 export class Node {
-  constructor(el, onAttached, onDetached) {
+  constructor(el) {
     this._attached = false
     this.el = el
     this.children = []
     this.observables = []
-    this.onAttached = onAttached
-    this.onDetached = onDetached
   }
   attached() {
     this._attached = true
     for (const child of this.children) {
       child.attached()
     }
-    this.onAttached && this.onAttached()
     this.sub = combineLatest(this.observables).subscribe()
   }
   detached() {
@@ -23,7 +20,6 @@ export class Node {
     for (const child of this.children) {
       child.detached()
     }
-    this.onDetached && this.onDetached()
     this.sub.unsubscribe()
   }
 }
@@ -49,7 +45,10 @@ export const createBuilder = (options) => {
 
     const { onAttached, onDetached, ...otherProps } = props || {}
     const el = createElement(name)
-    const node = new Node(el, onAttached, onDetached)
+    const node = new Node(el)
+    if (onAttached) {
+      node.observables.push(new Observable(() => { onAttached(); return onDetached }))
+    }
     const watch = (ob, callback) => node.observables.push(ob.pipe(map(callback)))
 
     for (const [key, value] of Object.entries(otherProps)) {
