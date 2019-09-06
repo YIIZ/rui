@@ -1,4 +1,6 @@
-class Node {
+import compute from 'compute-js'
+
+export class Node {
   constructor(el) {
     this.attached = false
     this.el = el
@@ -30,7 +32,7 @@ class Node {
 
 
 const stack = []
-function h(fn, props, ...children) {
+export function h(fn, props, ...children) {
   const effects = []
   stack.push(effects)
   const node = fn(props, children)
@@ -41,15 +43,24 @@ function h(fn, props, ...children) {
 function currentNode() {
   return stack[stack.length - 1]
 }
-function useEffect(effect) {
+
+export function useEffect(effect) {
   currentNode().push(effect)
 }
 
 
-function NodeTag({ el }, children) {
-  const node = new Node(el)
-  node.append(...children)
-  return node
-}
+// computes
+// TODO if unless each
+export { _if as if }
+function _if(value, fn) {}
 
-export { h, NodeTag as Node, useEffect }
+export function useState(inital) {
+  const state = compute.value(inital)
+  return [state, state.set]
+}
+export function useCompute(callback) {
+  return compute(callback)
+}
+export function isCompute(v) {
+  return typeof v?.computeName === 'string'
+}

@@ -1,47 +1,55 @@
 // @jsx h
-import { h, Node, useEffect } from './core'
+import { h, useCompute, useState, useEffect } from './core'
+import { Element } from './html'
 
-// TODO html adapter
-function Element({ tag }, children) {
-  const el = document.createElement(tag) // dom
-  return <Node el={el}>{...children}</Node>
-}
 
-function Container(props, children) {
-  useEffect(() => console.log('container effect'))
-  return <Element tag="div">
-    {...children}
-  </Element>
-}
+function Time() {
+  const [date, setDate] = useState(new Date())
 
-let c = 0
-function Input() {
-  const text = `input${c++} effect`
-  useEffect(() => console.log(text))
-  return <Element tag="input"></Element>
+  const jsonTime = useCompute(() => date().toJSON())
+  const displayTime = useCompute(() => date().toLocaleString())
+
+  useEffect(() => {
+    console.log('setInterval')
+    const t = setInterval(() => {
+      console.log('update time')
+      setDate(new Date())
+    }, 1000)
+
+    return () => {
+      console.log('clearInterval')
+      clearInterval(t)
+    }
+  })
+
+
+  return <Element tag="time" datetime={jsonTime}>{displayTime}</Element>
 }
 
 function App() {
-  useEffect(() => console.log('app effect'))
-  const i = <Input></Input>
-  useEffect(() => console.log('app effect2'))
+  const [show, setShow] = useState(false)
 
-  const c = <Container></Container>
+  const [name, setName] = useState('gates')
+  const fullname = useCompute(() => `bill ${name()}`)
 
-  useEffect(() => {
-    setTimeout(() => {
-      c.append(i)
-    }, 2000)
-  })
+  window.setName = setName
+  window.setShow = setShow
 
-  return <Container>
-    <Input></Input>
-    {c}
-    <Container>123</Container>
-  </Container>
+  window.fullname = fullname
+
+  return <Element tag="div">
+    <Element tag="span">Hi {fullname}</Element>
+    {useCompute(() => {
+      console.log('new time')
+      return show() ? <Time/> : null
+    })}
+    {useCompute(() => {
+      return show() ? <Element tag="span">Hi {fullname}</Element> : null
+    })}
+  </Element>
 }
 
-const app = <App/>
-document.body.append(app.el)
+const app = <App></App>
+document.body.appendChild(app.el)
 app.attach()
-
+window.app = app
