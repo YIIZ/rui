@@ -10,7 +10,11 @@ const createText = (text) => {
   return document.createTextNode(text)
 }
 const applyProp = (el, key, value) => {
-  el.setAttribute(key, value)
+  if (key in el) {
+    el[key] = value
+  } else {
+    el.setAttribute(key, value)
+  }
 }
 const append = (el, ...children) => {
   el.append(...children)
