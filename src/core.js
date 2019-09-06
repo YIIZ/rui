@@ -1,111 +1,55 @@
-import { Observable, BehaviorSubject, isObservable, combineLatest } from 'rxjs'
-import { map, shareReplay } from 'rxjs/operators'
-
-export class Node {
+class Node {
   constructor(el) {
-    this._attached = false
+    this.attached = false
     this.el = el
+    this.effects = []
     this.children = []
-    this.observables = []
-  }
-  attached() {
-    this._attached = true
-    for (const child of this.children) {
-      child.attached()
-    }
-    this.sub = combineLatest(this.observables).subscribe()
-  }
-  detached() {
-    this._attached = false
-    for (const child of this.children) {
-      child.detached()
-    }
-    this.sub.unsubscribe()
-  }
-}
-
-export const createBuilder = (options) => {
-  const {
-    createElement, createAnchor, createText,
-    applyProp,
-    append, after, remove,
-  } = options
-
-  const toNodes = (data) => {
-    const array = Array.isArray(data) ? data
-      : (data === null || typeof data === 'undefined') ? []
-      : [data]
-
-    const nodes = array.map((v) => v instanceof Node ? v : new Node(createText(v)))
-    return [nodes, nodes.map(n => n.el)]
   }
 
-  return function h(name, props, ...children) {
-    if (typeof name === 'function') return name(h, props, children)
+  append(...children) {
+    const nodes = children.map(c => c instanceof Node ? c : new Node(c))
 
-    const { onAttached, onDetached, ...otherProps } = props || {}
-    const el = createElement(name)
-    const node = new Node(el)
-    if (onAttached) {
-      node.observables.push(new Observable(() => { onAttached(); return onDetached }))
-    }
-    const watch = (ob, callback) => node.observables.push(ob.pipe(map(callback)))
+    this.children.push(...nodes)
+    this.el.append(...nodes.map(n => n.el)) // dom
 
-    for (const [key, value] of Object.entries(otherProps)) {
-      if (isObservable(value)) {
-        watch(value, (v) => applyProp(el, key, v))
-      } else {
-        applyProp(el, key, value)
-      }
-    }
+    if (this.attached) nodes.forEach(n => n.attach())
+  }
 
-    for (const child of children) {
-      if (isObservable(child)) {
-        const anchor = createAnchor()
-        const anchorNode = new Node(anchor)
-        append(el, anchor)
-        node.children.push(anchorNode)
-
-        let nodes = []
-        watch(child, (v) => {
-          const [newNodes, els] = toNodes(v)
-          nodes.forEach(n => remove(el, n.el))
-          after(el, anchor, ...els)
-
-          node.children.splice(node.children.indexOf(anchorNode) + 1, nodes.length, ...newNodes)
-          if (node._attached) {
-            newNodes.forEach(n => n.attached())
-            nodes.forEach(n => n.detached())
-          }
-
-          nodes = newNodes
-        })
-      } else {
-        const [nodes, els] = toNodes(child)
-        append(el, ...els)
-
-        node.children.push(...nodes)
-        if (node._attached) {
-          nodes.forEach(n => n.attached())
-        }
-      }
-    }
-
-    return node
+  attach() {
+    this.attached = true
+    this.children.forEach(n => n.attach())
+    this.clearEffects = this.effects.map(effect => effect())
+      .filter(clear => typeof clear === 'function')
+  }
+  detach() {
+    this.attached = false
+    this.children.forEach(n => n.detach())
+    this.clearEffects.forEach(clear => clear())
   }
 }
 
 
-// computes
-export function useState(inital) {
-  const state = new BehaviorSubject(inital)
-  const set = (v) => state.next(v)
-  return [ state, set ]
+const stack = []
+function h(fn, props, ...children) {
+  const effects = []
+  stack.push(effects)
+  const node = fn(props, children)
+  node.effects.push(...effects)
+  stack.pop()
+  return node
+}
+function currentNode() {
+  return stack[stack.length - 1]
+}
+function useEffect(effect) {
+  currentNode().push(effect)
 }
 
-export function useCompute(callback, deps) {
-  const obs = deps.map(v => isObservable(v) ? v : [v])
-  return combineLatest(obs)
-    .pipe(map((values) => callback(...values)))
-    .pipe(shareReplay({ bufferSize: 1, refCount: true })) // cache value
+
+function NodeTag({ el }, children) {
+  const node = new Node(el)
+  node.append(...children)
+  return node
 }
+
+export { h, NodeTag as Node, useEffect }

@@ -1,52 +1,47 @@
 // @jsx h
-import { useCompute, useState } from './core'
-import h from './html'
+import { h, Node, useEffect } from './core'
 
-function Time() {
-  const [date, setDate] = useState(new Date())
+// TODO html adapter
+function Element({ tag }, children) {
+  const el = document.createElement(tag) // dom
+  return <Node el={el}>{...children}</Node>
+}
 
-  const jsonTime = useCompute((date) => date.toJSON(), [date])
-  const displayTime = useCompute((date) => date.toLocaleString(), [date])
+function Container(props, children) {
+  useEffect(() => console.log('container effect'))
+  return <Element tag="div">
+    {...children}
+  </Element>
+}
 
-  // useEffect
-  let t
-  const onAttached = () => {
-    console.log('attached')
-    t = setInterval(() => {
-      console.log('update time')
-      setDate(new Date())
-    }, 1000)
-  }
-  const onDetached = () => {
-    console.log('detached')
-    clearInterval(t)
-  }
-
-  return <time datetime={jsonTime} onAttached={onAttached} onDetached={onDetached}>{displayTime}</time>
+let c = 0
+function Input() {
+  const text = `input${c++} effect`
+  useEffect(() => console.log(text))
+  return <Element tag="input"></Element>
 }
 
 function App() {
-  const [show, setShow] = useState(false)
+  useEffect(() => console.log('app effect'))
+  const i = <Input></Input>
+  useEffect(() => console.log('app effect2'))
 
-  const [name, setName] = useState('gates')
-  const fullname = useCompute((name) => `bill ${name}`, [name])
+  const c = <Container></Container>
 
-  window.setName = setName
-  window.setShow = setShow
+  useEffect(() => {
+    setTimeout(() => {
+      c.append(i)
+    }, 2000)
+  })
 
-  return <div>
-    <span>Hi {fullname}</span>
-    {useCompute((show) => {
-      console.log('new time')
-      return show ? <Time/> : null
-    }, [show])}
-    {useCompute((show) => {
-      return show ? <span>Hi {fullname}</span> : null
-    }, [show])}
-  </div>
+  return <Container>
+    <Input></Input>
+    {c}
+    <Container>123</Container>
+  </Container>
 }
 
-const app = <App></App>
-app.attached()
-document.body.appendChild(app.el)
+const app = <App/>
+document.body.append(app.el)
+app.attach()
 
