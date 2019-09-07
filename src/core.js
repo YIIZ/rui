@@ -1,4 +1,5 @@
-import compute from 'compute-js'
+export * from './compute'
+import { isCompute } from './compute'
 
 const toNodes = (data, createText) => {
   const array = Array.isArray(data) ? data
@@ -12,7 +13,7 @@ const toNodes = (data, createText) => {
 const watch = (computed, fn) => {
   // TODO no peek?
   const onChange = () => fn(computed.peek())
-  useEffect(() => {
+  hook(() => {
     computed.onChange(onChange)
     onChange()
     return () => computed.offChange(onChange)
@@ -23,7 +24,7 @@ export class Node {
   constructor(el, props, children) {
     this.attached = false
     this.el = el
-    this.effects = []
+    this.hooks = []
     this.children = []
 
     if (props)
@@ -74,47 +75,30 @@ export class Node {
   attach() {
     this.attached = true
     this.children.forEach(n => n.attach())
-    this.clearEffects = this.effects.map(effect => effect())
+    this.clearhooks = this.hooks.map(hook => hook())
       .filter(clear => typeof clear === 'function')
   }
   detach() {
     this.attached = false
     this.children.forEach(n => n.detach())
-    this.clearEffects.forEach(clear => clear())
+    this.clearhooks.forEach(clear => clear())
   }
 }
 
 
 const stack = []
 export function h(fn, props, ...children) {
-  const effects = []
-  stack.push(effects)
+  const hooks = []
+  stack.push(hooks)
   const node = fn(props, children)
-  node.effects.push(...effects)
+  node.hooks.push(...hooks)
   stack.pop()
   return node
 }
 function currentNode() {
   return stack[stack.length - 1]
 }
-
-export function useEffect(effect) {
-  currentNode().push(effect)
+export function hook(hook) {
+  currentNode().push(hook)
 }
 
-
-// computes
-// TODO if unless each
-export { _if as if }
-function _if(value, fn) {}
-
-export function useState(inital) {
-  const state = compute.value(inital)
-  return [state, state.set]
-}
-export function useCompute(callback) {
-  return compute(callback)
-}
-export function isCompute(v) {
-  return typeof v?.computeName === 'string'
-}

@@ -1,17 +1,14 @@
 // @jsx h
-import { h, useCompute, useState, useEffect } from './core'
+import { h, compute, value, hook } from './core'
 import { Element } from './html'
 
-import compute from 'compute-js'
-window.compute = compute
-
 function Time() {
-  const [date, setDate] = useState(new Date())
+  const [date, setDate] = value(new Date())
 
-  const jsonTime = useCompute(() => date().toJSON())
-  const displayTime = useCompute(() => date().toLocaleString())
+  const jsonTime = compute(() => date().toJSON())
+  const displayTime = compute(() => date().toLocaleString())
 
-  useEffect(() => {
+  hook(() => {
     console.log('setInterval')
     const t = setInterval(() => {
       console.log('update time')
@@ -29,9 +26,9 @@ function Time() {
 }
 
 function App() {
-  const [show, setShow] = useState(false)
-  const [name, setName] = useState('gates')
-  const fullname = useCompute(() => `bill ${name()}`)
+  const [show, setShow] = value(false)
+  const [name, setName] = value('gates')
+  const fullname = compute(() => `bill ${name()}`)
 
   window.setName = setName
   window.setShow = setShow
@@ -40,7 +37,7 @@ function App() {
   return <Element tag="div">
     <Element tag="div">Hi {fullname}</Element>
     <Element tag="button" onclick={() => setShow(!show())}>Toggle</Element>
-    <Element tag="div">{useCompute(() => show() ? <Time/> : null)}</Element>
+    <Element tag="div">{compute(() => show() ? <Time/> : null)}</Element>
   </Element>
 }
 
