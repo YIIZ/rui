@@ -1,20 +1,74 @@
 import compute from 'compute-js'
 
+const toNodes = (data, createText) => {
+  const array = Array.isArray(data) ? data
+    : (data === null || typeof data === 'undefined') ? []
+    : [data]
+
+  const nodes = array.map((v) => v instanceof Node ? v : new Node(createText(v)))
+  return nodes
+}
+
+const watch = (computed, fn) => {
+  // TODO no peek?
+  const onChange = () => fn(computed.peek())
+  useEffect(() => {
+    computed.onChange(onChange)
+    onChange()
+    return () => computed.offChange(onChange)
+  })
+}
+
 export class Node {
-  constructor(el) {
+  constructor(el, props, children) {
     this.attached = false
     this.el = el
     this.effects = []
     this.children = []
+
+    if (props)
+    for (const [key, value] of Object.entries(props)) {
+      if (isCompute(value)) {
+        watch(value, (v) => this.applyProp(el, key, v))
+      } else {
+        this.applyProp(el, key, value)
+      }
+    }
+
+    if (children)
+    for (const child of children) {
+      if (isCompute(child)) {
+        const anchor = new Node(this.createAnchor())
+        this.append([anchor])
+
+        let nodes = []
+        watch(child, (v) => {
+          // TODO no createText as param
+          const newNodes = toNodes(v, this.createText)
+          this.replace(anchor, nodes, newNodes)
+          nodes = newNodes
+        })
+      } else {
+        const nodes = toNodes(child, this.createText)
+        this.append(nodes)
+      }
+    }
   }
 
-  append(...children) {
-    const nodes = children.map(c => c instanceof Node ? c : new Node(c))
-
+  createText() {}
+  createAnchor() {}
+  applyProp(el, key, value) {}
+  append(nodes) {
     this.children.push(...nodes)
-    this.el.append(...nodes.map(n => n.el)) // dom
-
     if (this.attached) nodes.forEach(n => n.attach())
+  }
+  replace(anchor, oldNodes, newNodes) {
+    const { children } = this
+    children.splice(children.indexOf(anchor)+1, oldNodes.length, ...newNodes)
+    if (this.attached) {
+      newNodes.forEach(n => n.attach())
+      oldNodes.forEach(n => n.detach())
+    }
   }
 
   attach() {
