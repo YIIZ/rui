@@ -1,15 +1,6 @@
 export * from './compute'
 import { isCompute } from './compute'
 
-const toNodes = (data, createText) => {
-  const array = Array.isArray(data) ? data
-    : (data === null || typeof data === 'undefined') ? []
-    : [data]
-
-  const nodes = array.map((v) => v instanceof Node ? v : new Node(createText(v)))
-  return nodes
-}
-
 const watch = (computed, fn) => {
   // TODO no peek?
   const onChange = () => fn(computed.peek())
@@ -38,20 +29,30 @@ export class Node {
 
     if (children)
     for (const child of children) {
-      if (isCompute(child)) {
-        const anchor = new Node(this.createAnchor())
-        this.append([anchor])
-
-        let nodes = []
-        watch(child, (v) => {
-          // TODO no createText as param
-          const newNodes = toNodes(v, this.createText)
-          this.replace(anchor, nodes, newNodes)
-          nodes = newNodes
-        })
+      if (!isCompute(child)) {
+        if (child instanceof Node) {
+          this.append(child)
+        } else {
+          const node = new Node(this.createText(child))
+          this.append(node)
+        }
       } else {
-        const nodes = toNodes(child, this.createText)
-        this.append(nodes)
+        if (child.__each) {
+          const anchor = new Node(this.createAnchor())
+          this.append(anchor)
+
+          let nodes = []
+          watch(child, (items) => {
+            // TODO no createText as param
+            const newNodes = items.map((v) => v instanceof Node ? v : new Node(this.createText(v)))
+            this.replace(anchor, nodes, newNodes)
+            nodes = newNodes
+          })
+        } else {
+          const node = new Node(this.createText(''))
+          watch(child, (v) => this.updateText(node.el, v))
+          this.append(node)
+        }
       }
     }
   }
@@ -59,9 +60,9 @@ export class Node {
   createText() {}
   createAnchor() {}
   applyProp(el, key, value) {}
-  append(nodes) {
-    this.children.push(...nodes)
-    if (this.attached) nodes.forEach(n => n.attach())
+  append(node) {
+    this.children.push(node)
+    if (this.attached) node.attach()
   }
   replace(anchor, oldNodes, newNodes) {
     const { children } = this

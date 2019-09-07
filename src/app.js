@@ -1,5 +1,5 @@
 // @jsx h
-import { h, compute, value, hook } from './core'
+import { h, compute, value, hook, if as _if } from './core'
 import { Element } from './html'
 
 function Time() {
@@ -37,7 +37,7 @@ function App() {
   return <Element tag="div">
     <Element tag="div">Hi {fullname}</Element>
     <Element tag="button" onclick={() => setShow(!show())}>Toggle</Element>
-    <Element tag="div">{compute(() => show() ? <Time/> : null)}</Element>
+    <Element tag="div">{_if(show, () => <Time/>)}</Element>
   </Element>
 }
 

@@ -10,6 +10,9 @@ class HTMLNode extends Node {
   createText(text) {
     return document.createTextNode(text)
   }
+  updateText(el, text) {
+    el.data = text
+  }
   applyProp(el, key, value) {
     if (key in el) {
       el[key] = value
@@ -17,9 +20,9 @@ class HTMLNode extends Node {
       el.setAttribute(key, value)
     }
   }
-  append(nodes) {
-    this.el.append(...nodes.map(({ el }) => el))
-    super.append(nodes)
+  append(node) {
+    this.el.append(node.el)
+    super.append(node)
   }
   replace(anchor, oldNodes, newNodes) {
     oldNodes.forEach(({ el }) => el.remove())
