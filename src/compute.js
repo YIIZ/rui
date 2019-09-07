@@ -16,7 +16,10 @@ export function each(value, fn) {
   return c
 }
 function _if(value, fn) {
-  return each(compute(() => value() ? [null] : []), fn)
+  // pre-create them for cache purpose
+  const one = [1]
+  const zero = []
+  return each(compute(() => value() ? one : zero), fn)
 }
 export function unless(value, fn) {
   return _if(compute(() => !value()), fn)
