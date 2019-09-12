@@ -5,7 +5,7 @@ export function value(inital) {
   return [state, state.set]
 }
 export function isCompute(v) {
-  return typeof v?.computeName === 'string'
+  return v && typeof v.computeName === 'string'
 }
 
 
