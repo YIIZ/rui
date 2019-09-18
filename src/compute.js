@@ -20,13 +20,20 @@ export function replace(value) {
   return v
 }
 export function each(value, fn) {
-  return replace(() => value().map(fn))
+  // cache value
+  // TODO key?
+  const v = compute(value)
+  return replace(() => v().map(fn))
 }
 function _if(value, fn) {
-  return replace(() => value() ? fn() : null)
+  const v = compute(value) // any value to compute
+  const bool = compute(() => !!v()) // to bool
+  return replace(() => bool() ? fn() : null)
 }
 export function unless(value, fn) {
-  return _if(() => !value(), fn)
+  const v = compute(value)
+  const bool = compute(() => !v())
+  return replace(() => bool() ? fn() : null)
 }
 
 export { _if as if, compute }
