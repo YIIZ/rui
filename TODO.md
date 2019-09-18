@@ -1,4 +1,0 @@
-- computed cache
-- array performance(keys and reuse)
-- text performance
-- ECS renderer
