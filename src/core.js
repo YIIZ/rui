@@ -1,15 +1,20 @@
 export * from './compute'
-import { isCompute } from './compute'
+import { isReplace, isCompute } from './compute'
 
 const watch = (computed, fn) => {
   // TODO no peek?
   const onChange = () => fn(computed.peek())
   hook(() => {
     computed.onChange(onChange)
+    // NODE: due to compute's mechanism, retrieve before watch will cause compute double times
+    // eg. {_if(v, () => <Large/>)}
+    // will init `<Large/>` in initialization and attach phase
+    // so we currently only retrieve value after attach
     onChange()
     return () => computed.offChange(onChange)
   })
 }
+
 
 export class Node {
   constructor(el, props, children) {
@@ -29,48 +34,39 @@ export class Node {
 
     if (children)
     for (const child of children) {
-      if (!isCompute(child)) {
-        if (child instanceof Node) {
-          this.append(child)
-        } else {
-          const node = new Node(this.createText(child))
-          this.append(node)
-        }
+      if (!isReplace(child)) {
+        // TODO check instanceof Node?
+        this.append(child)
       } else {
-        if (child.__each) {
-          const anchor = new Node(this.createAnchor())
-          this.append(anchor)
+        const anchor = this.createAnchor()
+        this.append(anchor)
 
-          let nodes = []
-          watch(child, (items) => {
-            // TODO no createText as param
-            const newNodes = items.map((v) => v instanceof Node ? v : new Node(this.createText(v)))
-            this.replace(anchor, nodes, newNodes)
-            nodes = newNodes
-          })
-        } else {
-          const node = new Node(this.createText(''))
-          watch(child, (v) => this.updateText(node.el, v))
-          this.append(node)
-        }
+        let nodes = [anchor]
+        watch(child, (v) => {
+          // v[Symbol.iterator]?
+          const newNodes = Array.isArray(v) ? v : v != null ? [v] : [anchor]
+          nodes = this.replace(nodes, newNodes)
+        })
       }
     }
   }
 
-  createText() {}
   createAnchor() {}
-  applyProp(el, key, value) {}
+  applyProp(el, key, value) {
+    el[key] = value
+  }
   append(node) {
     this.children.push(node)
     if (this.attached) node.attach()
   }
-  replace(anchor, oldNodes, newNodes) {
+  replace(oldNodes, newNodes) {
     const { children } = this
-    children.splice(children.indexOf(anchor)+1, oldNodes.length, ...newNodes)
+    children.splice(children.indexOf(oldNodes[0])+1, oldNodes.length, ...newNodes)
     if (this.attached) {
       newNodes.forEach(n => n.attach())
       oldNodes.forEach(n => n.detach())
     }
+    return newNodes
   }
 
   attach() {

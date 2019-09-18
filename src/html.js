@@ -1,17 +1,18 @@
 import { Node } from './core'
 
+function Text({ data='' }) {
+  return new Node(document.createTextNode(data), { data })
+}
+// convert text to node
+const toNode = c => c instanceof Node ? c : <Text data={c}></Text>
+
 class HTMLNode extends Node {
   constructor(tag, props, children) {
-    super(document.createElement(tag), props, children)
+    const el = typeof tag === 'string' ? document.createElement(tag) : tag
+    super(el, props, children)
   }
   createAnchor() {
-    return document.createTextNode('')
-  }
-  createText(text) {
-    return document.createTextNode(text)
-  }
-  updateText(el, text) {
-    el.data = text
+    return <Text data=""></Text>
   }
   applyProp(el, key, value) {
     if (key in el) {
@@ -20,14 +21,16 @@ class HTMLNode extends Node {
       el.setAttribute(key, value)
     }
   }
-  append(node) {
+  append(_node) {
+    const node = toNode(_node)
     this.el.append(node.el)
     super.append(node)
   }
-  replace(anchor, oldNodes, newNodes) {
+  replace(oldNodes, _newNodes) {
+    const newNodes = _newNodes.map(toNode)
+    oldNodes[0].el.after(...newNodes.map(({ el }) => el))
     oldNodes.forEach(({ el }) => el.remove())
-    anchor.el.after(...newNodes.map(({ el }) => el))
-    super.replace(anchor, oldNodes, newNodes)
+    return super.replace(oldNodes, newNodes)
   }
 }
 

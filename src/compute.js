@@ -7,20 +7,23 @@ export function value(inital) {
 export function isCompute(v) {
   return v && typeof v.computeName === 'string'
 }
+export function isReplace(v) {
+  return isCompute(v) && v.__replace
+}
 
 
 // convenience methods
-export function each(value, fn) {
+export function replace(value) {
+  // TODO `dep()` in compute
   const v = compute(value)
-  const c = compute(() => v().map(fn))
-  c.__each = true
-  return c
+  v.__replace = true
+  return v
+}
+export function each(value, fn) {
+  return replace(() => value().map(fn))
 }
 function _if(value, fn) {
-  // pre-create them for cache purpose
-  const one = [1]
-  const zero = []
-  return each(() => value() ? one : zero, fn)
+  return replace(() => value() ? fn() : null)
 }
 export function unless(value, fn) {
   return _if(() => !value(), fn)
