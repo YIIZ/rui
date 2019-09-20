@@ -1,10 +1,10 @@
 import { Node } from './core'
 
-function Text({ data='' }) {
+function createTextNode(data='') {
   return new Node(document.createTextNode(data), { data })
 }
 // convert text to node
-const toNode = c => c instanceof Node ? c : <Text data={c}></Text>
+const toNode = c => c instanceof Node ? c : createTextNode(c)
 
 class HTMLNode extends Node {
   constructor(tag, props, children) {
@@ -12,7 +12,7 @@ class HTMLNode extends Node {
     super(el, props, children)
   }
   createAnchor() {
-    return <Text data=""></Text>
+    return createTextNode()
   }
   applyProp(el, key, value) {
     if (key in el) {
