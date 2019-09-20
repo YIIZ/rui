@@ -2,3 +2,4 @@ test
 *.log
 yarn.lock
 tmp
+examples
