@@ -1,0 +1,19 @@
+const fs = require('fs')
+
+const filePath = require.resolve('pixi-spine')
+const content = fs.readFileSync(filePath, 'utf8')
+
+module.exports = () => {
+  return {
+    code:
+`
+import * as PIXI from 'pixi.js'
+${content}
+
+var Spine = pixi_spine.Spine
+export { Spine }
+`,
+    cacheable: true,
+    dependencies: [filePath],
+  }
+}
