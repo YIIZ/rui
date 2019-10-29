@@ -45,3 +45,25 @@ test('lifecycle', t => {
   app.detach()
   t.is(attached, false)
 })
+
+
+test('hook params', t => {
+  let root, parent
+
+  function Child() {
+    hook((root1, parent1) => {
+      console.log(parent1)
+      root = root1
+      parent = parent1
+    })
+    return new Node()
+  }
+  function App(props, children) {
+    return new Node(null, null, [h(Child)])
+  }
+  const app = h(App)
+  app.attach()
+
+  t.is(root, app)
+  t.is(parent, app)
+})

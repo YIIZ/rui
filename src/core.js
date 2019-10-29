@@ -45,6 +45,7 @@ export class Node {
         watch(child, (v) => {
           // v[Symbol.iterator]?
           const newNodes = Array.isArray(v) ? v : v != null ? [v] : [anchor]
+          // TODO prevent first replace?
           nodes = this.replace(nodes, newNodes)
         })
       }
@@ -57,22 +58,24 @@ export class Node {
   }
   append(node) {
     this.children.push(node)
-    if (this.attached) node.attach()
+    if (this.attached) node.attach(this.root, this)
   }
   replace(oldNodes, newNodes) {
     const { children } = this
     children.splice(children.indexOf(oldNodes[0])+1, oldNodes.length, ...newNodes)
     if (this.attached) {
-      newNodes.forEach(n => n.attach())
+      newNodes.forEach(n => n.attach(this.root, this))
       oldNodes.forEach(n => n.detach())
     }
     return newNodes
   }
 
-  attach() {
+  attach(root=this, parent) {
+    // TODO ancestors?
+    this.root = root
     this.attached = true
-    this.children.forEach(n => n.attach())
-    this.clearhooks = this.hooks.map(hook => hook())
+    this.children.forEach(n => n.attach(this.root, this))
+    this.clearhooks = this.hooks.map(hook => hook(this.root, parent))
       .filter(clear => typeof clear === 'function')
   }
   detach() {
