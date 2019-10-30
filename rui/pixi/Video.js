@@ -5,12 +5,8 @@ import { Sprite, Container } from './nodes'
 import { everyFrame } from 'popmotion'
 
 import DOMDummy from './DOMDummy'
-import Spinner from './Spinner'
 
 export default function Video({ src, onEnd, onTimeUpdate, ratio, width, height, ...props }) {
-  const [playing, setPlaying] = value(false)
-  const [waiting, setWaiting] = value(false)
-
   // Container has no size
   const node = <Container {...props}><Sprite width={width} height={height}></Sprite></Container>
 
@@ -28,30 +24,21 @@ export default function Video({ src, onEnd, onTimeUpdate, ratio, width, height, 
   </DOMDummy>
 
   const { dom } = dummy
-  const out = <Container>
-    {dummy}
-    {_if(waiting, () => <Spinner></Spinner>)}
-  </Container>
 
-
-  out.play = async () => {
-    setPlaying(true)
-    setWaiting(true)
+  dummy.play = async () => {
     dom.play()
     await new Promise((resolve) => {
-      const play = everyFrame().start(() => {
+      const check = everyFrame().start(() => {
         if (dom.currentTime >= 0.1) {
+          check.stop()
           resolve()
-          play.stop()
         }
       })
     })
-    setWaiting(false)
   }
-  out.pause = () => {
-    setPlaying(false)
-    setWaiting(false)
+  dummy.pause = () => {
+    dom.pause()
   }
 
-  return out
+  return dummy
 }

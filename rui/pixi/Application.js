@@ -3,6 +3,7 @@ import { h, hook, compute } from 'rui'
 import * as PIXI from 'pixi.js'
 
 import { Node } from './nodes'
+import Busy from './Busy'
 
 // TODO built-in size?
 function Application({ size, transparent=false }, children) {
@@ -29,8 +30,29 @@ function Application({ size, transparent=false }, children) {
   node.renderer = renderer
   return node
 }
+
+function BusyApplication({ size, ...props }, children) {
+  const busy = <Busy
+    width={compute(() => size().width)}
+    height={compute(() => size().height)}
+  ></Busy>
+
+  const app = <Application size={size} {...props}>
+    {...children}
+    {busy}
+  </Application>
+
+  app.busy = async (cb) => {
+    busy.inc()
+    await cb()
+    busy.dec()
+  }
+
+  return app
+}
+
 export default function AttachedApplication(props, children) {
-  const node = <Application {...props}>{...children}</Application>
+  const node = <BusyApplication {...props}>{...children}</BusyApplication>
   node.attach()
   return node
 }
