@@ -18,7 +18,11 @@ export default function Switcher({ init }, items) {
     prev = current
     current = node
     container.append(current)
-    await typeof cb === 'function' && cb(current, prev) // clean non-function param
+
+    if (typeof cb === 'function') {
+      // clean non-function param
+      await cb(current, prev)
+    }
 
     // remove prev
     prev && container.replace([prev], [])
