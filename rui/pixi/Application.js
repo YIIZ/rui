@@ -56,3 +56,12 @@ export default function AttachedApplication(props, children) {
   node.attach()
   return node
 }
+
+// TODO?
+// export function CompoundApplication(props, children) {
+//   return <AttachedApplication size={useAppSize()}>
+//     <Switcher init>{...children}</Switcher>
+//     <Busy></Busy>
+//   </AttachedApplication>
+// }
+
