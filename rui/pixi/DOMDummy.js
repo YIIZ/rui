@@ -21,9 +21,10 @@ function computeWorldTransform(transform, ratio) {
 }
 
 // TODO use ratio by useAppSize?
-export default function DOMDummy({ fixedWidth, visible, style:_style='', ratio, ...props }, [node]) {
+export default function DOMDummy({ visible, style:_style='', ratio, ...props }, [node]) {
   const target = node.el
   const matrix = computeWorldTransform(target.transform, ratio)
+  // TODO fix Text sizing, getBounds()?
   // TODO compute?
   const { width, height, x, y } = target.getLocalBounds()
 
