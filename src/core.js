@@ -1,7 +1,7 @@
 export * from './compute'
 import { isReplace, isCompute } from './compute'
 
-const watch = (computed, fn) => {
+export const watch = (computed, fn) => {
   // TODO no peek?
   const onChange = () => fn(computed.peek())
   hook(() => {
