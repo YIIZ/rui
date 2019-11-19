@@ -64,7 +64,7 @@ export function Sprite({ tex, ...props }, children) {
   return new PIXINode(el, props, children)
 }
 
-export function Text({ fontFamily='Arial', fontSize, fill, ...props }, children) {
+export function Text({ fontFamily='Arial', fontSize, fill=0xFFFFFF, ...props }, children) {
   const el = new PIXI.Text('', {
     fontFamily,
     fontSize,
