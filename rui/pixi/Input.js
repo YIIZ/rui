@@ -11,7 +11,7 @@ function Caret(props) {
   const [alpha, setAlpha] = value(1)
   hook(() => {
     const play = tween({
-      from: 0.8, to: 0.2, duration: 800,
+      from: 0.8, to: 0, duration: 800,
       yoyo: Infinity,
       ease: easing.linear,
     }).start(setAlpha)
