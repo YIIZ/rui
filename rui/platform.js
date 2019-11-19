@@ -24,14 +24,18 @@ export const useRotateSize = (landscape=true) => {
   })
 }
 
-// TODO contain/cover
+// TODO cover?
 export const useAppSize = (designWidth=750, designHeight=1500) => {
   const size = useRotateSize(designWidth >= designHeight)
   return compute(() => {
     const { width, height, rotate, rotation } = size()
-    const ratio = designHeight / height
+    const parentWidth = designWidth
+    const parentHeight = designHeight
+
+    // contain
+    const ratio = Math.min(parentWidth/width, parentHeight/height)
     return {
-      height: designHeight,
+      height: Math.ceil(ratio * height),
       width: Math.ceil(ratio * width),
       rotate,
       rotation,
