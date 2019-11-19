@@ -7,17 +7,24 @@ import { Container } from './nodes'
 // <Component onNext={(nextKey, params, async function callback (enter, leave) => done())}></Component>
 export default function Switcher({ init }, items) {
   const itemsMap = new Map(items)
-  const container = <Container></Container>
+  const head = <Container></Container>
+  const container = <Container>{head}</Container>
 
   let prev, current
-  const change = async (name, params, cb) => {
+  const change = async (name, { prepend, ...params }={}, cb) => {
     // TODO once onNext?
     const Node = itemsMap.get(name)
     const node = <Node onNext={change} {...params}></Node>
 
     prev = current
     current = node
-    container.append(current)
+
+    if (prepend) {
+      // no prepend api
+      container.replace([head], [head, current])
+    } else {
+      container.append(current)
+    }
 
     if (typeof cb === 'function') {
       // clean non-function param
