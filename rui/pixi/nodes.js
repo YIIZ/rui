@@ -64,10 +64,11 @@ export function Sprite({ tex, ...props }, children) {
   return new PIXINode(el, props, children)
 }
 
-export function Text({ fontFamily='Arial', fontSize, fill=0xFFFFFF, ...props }, children) {
+export function Text({ fontFamily='Arial', fontSize, fontWeight=400, fill=0xFFFFFF, ...props }, children) {
   const el = new PIXI.Text('', {
     fontFamily,
     fontSize,
+    fontWeight,
     fill,
   })
   el.anchor.set(0.5)
