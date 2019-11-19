@@ -6,8 +6,8 @@ import { Node } from './nodes'
 import Busy from './Busy'
 
 // TODO built-in size?
-function Application({ size, transparent=false }, children) {
-  const app = new PIXI.Application({ transparent })
+function Application({ size, ...props }, children) {
+  const app = new PIXI.Application(props)
   const { stage, renderer, view } = app
 
   const wh = compute(() => {
