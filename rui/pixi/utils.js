@@ -17,9 +17,11 @@ export const oncePointerEnd = (target, handler) => {
   onPointerEnd(target, end)
 }
 
+// export const awaitTween = playback =>
 
-async function doload(list, onProgress, useShared) {
-  const loader = useShared ? PIXI.Loader.shared : new PIXI.Loader()
+
+async function doload(list, onProgress) {
+  const loader = PIXI.Loader.shared
 
   for (const [id, image, metadata] of list) {
     loader.add(`${id}`, image, { metadata })
@@ -32,13 +34,13 @@ async function doload(list, onProgress, useShared) {
   })
   return loader.resources
 }
-export function load(items, { shared=false, minDuration=0 } = {}) {
+export function load(items, { minDuration=0 } = {}) {
   const [ready, setReady] = value(false)
   const [loadProgress, setLoadProgress] = value(0)
   const [fakeProgress, setFakeProgress] = value(0)
   const progress = compute(() => loadProgress() * fakeProgress())
 
-  const realLoad = doload(items, setLoadProgress, shared)
+  const realLoad = doload(items, setLoadProgress)
   const fakeLoad = minDuration > 0
     ? new Promise(complete => tween({ duration: minDuration }).start({ update: setFakeProgress, complete }))
     : setFakeProgress(1)
