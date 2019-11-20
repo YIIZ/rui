@@ -31,17 +31,21 @@ export default function Input({ placeholder, ratio, fontSize, fill, fontFamily, 
   // select all on focus https://stackoverflow.com/a/4067488
   const selectAllText = (el) => el.setSelectionRange(0, el.value.length)
 
-  const textNode = <Text fontSize={fontSize} fill={fill} fontFamily={fontFamily}>{displayText}</Text>
-  // const caret = <Sprite tex={PIXI.Texture.WHITE} />
+  const textNode = <Text fontSize={fontSize} fill={fill} fontFamily={fontFamily}
+    alpha={compute(() => usePlaceholder() ? 0.5 : 1)}
+  >{displayText}</Text>
+  // TODO better position
+  textNode.el.text = placeholder
+  const caret = <Caret x={textNode.el.width*-0.5-10} height={textNode.el.height} />
 
   const node = <DOMDummy tag="input"
     style="font-size: 1px;" ratio={ratio}
     onclick={({ target }) => selectAllText(target)}
-    oninput={({ target }) => setText(target.value || placeholder)}
+    oninput={({ target }) => setText(target.value)}
   >
     <Container {...props}>
       {...children}
-      {_if(usePlaceholder, () => <Caret x={textNode.el.width*-0.5-10} height={textNode.el.height} />)}
+      {_if(usePlaceholder, () => caret)}
       {textNode}
     </Container>
   </DOMDummy>
