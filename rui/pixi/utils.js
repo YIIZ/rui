@@ -57,13 +57,19 @@ let sharedRenderer
 let sharedRenderTexture
 export function capture(
   displayObject,
-  { format = 'image/jpeg', quality = 0.8, width=displayObject.width, height=displayObject.height } = {}
+  { format = 'image/jpeg', quality = 0.8/*, width=displayObject.width, height=displayObject.height*/ } = {}
 ) {
+  const { x, y, width, height } = displayObject.getBounds()
+  const container = new PIXI.Container()
+  container.addChild(displayObject)
+  container.x = -x
+  container.y = -y
+
   // cache
   const renderer = sharedRenderer = sharedRenderer || PIXI.autoDetectRenderer()
   const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create(0, 0)
   rt.resize(width, height)
-  renderer.render(displayObject, rt)
+  renderer.render(container, rt)
   const dataURL = renderer.extract.canvas(rt).toDataURL(format, quality)
   return dataURL
 }
