@@ -3,12 +3,25 @@ import { h, value, compute, hook, if as _if, each } from 'rui'
 import { Container, Sprite, Text } from './nodes'
 
 import { oncePointerEnd } from './utils'
+import { tween } from 'popmotion'
 
-export default function Button({ tex, onbuttontap, ...props }, children) {
-  const node = <Sprite tex={tex} {...props}>{...children}</Sprite>
-  const sprite = node.el
+export default function Button({ tex, onTap, ...props }, children) {
+  const [scale, setScale] = value(1)
 
-  sprite.interactive = true
+  let taped = false
+  const tap = () => taped = true
+  const down = () => tween({ from: 1, to: 0.9, duration: 50 }).start(setScale)
+  const up = () => tween({ from: 0.9, to: 1, duration: 50 }).start(setScale)
+
+
+  return <Sprite tex={tex} {...props}
+    scale={scale}
+    onpointertap={tap}
+    onpointerdown={down}
+    onpointerup={up}
+    onpointerupoutside={up}
+    onpointercancel={up}
+  >{...children}</Sprite>
 
   // copyed
   // TODO rui-it
