@@ -64,15 +64,17 @@ export function Sprite({ tex, ...props }, children) {
   return new PIXINode(el, props, children)
 }
 
-export function Text({ fontFamily='Arial', fontSize, fontWeight=400, fill=0xFFFFFF, ...props }, children) {
-  const el = new PIXI.Text('', {
+export function Text({ fontFamily='Arial', fontSize=24, fontWeight=400, fontStyle='normal', fill=0xFFFFFF, ...props }, children) {
+  const text = compute(() => children.map(c => typeof c === 'function' ? c() : c).join(''))
+
+  // TODO no compute call?
+  const el = new PIXI.Text(text(), {
     fontFamily,
     fontSize,
     fontWeight,
+    fontStyle,
     fill,
   })
   el.anchor.set(0.5)
-
-  const text = compute(() => children.map(c => typeof c === 'function' ? c() : c).join(''))
   return new PIXINode(el, { text, ...props })
 }
