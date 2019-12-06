@@ -1,5 +1,5 @@
 export * from './compute'
-import { isReplace, isCompute } from './compute'
+import { isReplace, isCompute, value } from './compute'
 
 export const watch = (computed, fn) => {
   // TODO no peek?
@@ -75,7 +75,7 @@ export class Node {
     this.root = root
     this.attached = true
     this.children.forEach(n => n.attach(this.root, this))
-    this.clearhooks = this.hooks.map(hook => hook(this.root, parent))
+    this.clearhooks = this.hooks.map(hook => hook(this))
       .filter(clear => typeof clear === 'function')
   }
   detach() {
@@ -95,10 +95,19 @@ export function h(fn, props, ...children) {
   stack.pop()
   return node
 }
-function currentNode() {
+function currentHooks() {
   return stack[stack.length - 1]
 }
+
 export function hook(hook) {
-  currentNode().push(hook)
+  currentHooks().push(hook)
+}
+export function useRoot() {
+  const [root, setRoot] = value(null)
+  hook((self) => {
+    setRoot(self.root)
+    return () => setRoot(null)
+  })
+  return root
 }
 

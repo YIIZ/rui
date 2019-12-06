@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Node, h, hook } from '../src/core'
+import { Node, h, hook, useRoot } from '../src/core'
 
 test('basic', t => {
   function App(props, children) {
@@ -48,13 +48,11 @@ test('lifecycle', t => {
 
 
 test('hook params', t => {
-  let root, parent
+  let child
 
   function Child() {
-    hook((root1, parent1) => {
-      console.log(parent1)
-      root = root1
-      parent = parent1
+    hook((self) => {
+      child = self
     })
     return new Node()
   }
@@ -64,6 +62,23 @@ test('hook params', t => {
   const app = h(App)
   app.attach()
 
-  t.is(root, app)
-  t.is(parent, app)
+  t.is(child, app.children[0])
+})
+
+test('useRoot', t => {
+  let app
+
+  function Child() {
+    const root = useRoot()
+    t.is(root(), null)
+    hook(() => {
+      t.is(root(), app)
+    })
+    return new Node()
+  }
+  function App(props, children) {
+    return new Node(null, null, [h(Child)])
+  }
+  app = h(App)
+  app.attach()
 })
