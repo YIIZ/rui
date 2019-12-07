@@ -28,6 +28,7 @@ function Application({ size, ...props }, children) {
   node.view = view
   node.stage = stage
   node.renderer = renderer
+  node.size = size
   return node
 }
 
