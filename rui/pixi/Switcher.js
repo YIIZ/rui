@@ -11,10 +11,11 @@ export default function Switcher({ init }, items) {
   const container = <Container>{head}</Container>
 
   let prev, current
-  const change = async (name, { prepend, ...params }={}, cb) => {
+  const change = async (name, options, cb) => {
+    const { prepend, ...props } = options || {}
     // TODO once onNext?
     const Node = itemsMap.get(name)
-    const node = <Node onNext={change} {...params}></Node>
+    const node = <Node onNext={change} {...props}></Node>
 
     prev = current
     current = node
