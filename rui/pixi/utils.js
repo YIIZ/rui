@@ -28,8 +28,12 @@ async function doload(list, onProgress) {
   }
 
   await new Promise((resolve) => {
-    loader.on('progress', () => onProgress(loader.progress/100))
-    loader.on('complete', resolve)
+    const onProgress2 = () => onProgress(loader.progress/100)
+    loader.on('progress', onProgress2)
+    loader.once('complete', () => {
+      loader.off('progress', onProgress2)
+      resolve()
+    })
     loader.load()
   })
   return loader.resources
