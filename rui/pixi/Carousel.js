@@ -25,12 +25,12 @@ function replaceItem(getNode, fromState, toState) {
 }
 
 // TODO custom animation style
-const defaultState = () => ({
+const defaultStyle = () => ({
   x: 0,
   alpha: 1,
   scale: 1,
 })
-const moveState = (left) => ({
+const moveStyle = (left) => ({
   x: left ? 100 : -100,
   alpha: 0,
   scale: 0.8,
@@ -54,8 +54,8 @@ export default function Carousel(props, children) {
   }
 
   const node = <Container>
-    {replaceItem(enter, () => moveState(direction>0), defaultState)}
-    {replaceItem(leave, defaultState, () => moveState(direction<0))}
+    {replaceItem(enter, () => leave() ? moveStyle(direction>0) : defaultStyle(), defaultStyle)}
+    {replaceItem(leave, defaultStyle, () => moveStyle(direction<0))}
   </Container>
 
   node.next = () => update(1)
