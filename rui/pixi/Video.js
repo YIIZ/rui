@@ -6,13 +6,13 @@ import { everyFrame } from 'popmotion'
 
 import DOMDummy from './DOMDummy'
 
-export default function Video({ src, onEnd, onTimeUpdate, ratio, width, height, ...props }) {
+export default function Video({ src, onEnd, onTimeUpdate, width, height, ...props }) {
   // Container has no size
   const node = <Container {...props}><Sprite width={width} height={height}></Sprite></Container>
 
   // TODO?
   // isQQ && isIOS this.elem.setAttribute('x5-playsinline', 'true')
-  const dummy = <DOMDummy tag="video" ratio={ratio}
+  const dummy = <DOMDummy tag="video"
     visible
     src={src}
     playsinline

@@ -1,5 +1,5 @@
 // @jsx h
-import { h, value, compute, hook } from 'rui'
+import { h, value, compute, hook, useRoot } from 'rui'
 import { Element } from 'rui/src/html'
 
 function computeWorldTransform(transform, ratio) {
@@ -21,7 +21,11 @@ function computeWorldTransform(transform, ratio) {
 }
 
 // TODO use ratio by useAppSize?
-export default function DOMDummy({ visible, style:_style='', ratio, ...props }, [node]) {
+export default function DOMDummy({ visible, style:_style='', ...props }, [node]) {
+  const root = useRoot()
+  // TODO no need to check root?
+  const ratio = () => root()?.size().ratio
+
   const target = node.el
   const matrix = computeWorldTransform(target.transform, ratio)
   // TODO fix Text sizing, getBounds()?

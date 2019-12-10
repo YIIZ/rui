@@ -23,7 +23,7 @@ function Caret(props) {
   />
 }
 
-export default function Input({ placeholder, ratio, fontSize, fill, fontFamily, ...props }, children) {
+export default function Input({ placeholder, fontSize, fill, fontFamily, ...props }, children) {
   const [text, setText] = value('')
   const usePlaceholder = compute(() => text().length < 1)
   const displayText = compute(() => usePlaceholder() ? placeholder : text())
@@ -39,7 +39,7 @@ export default function Input({ placeholder, ratio, fontSize, fill, fontFamily, 
   const caret = <Caret x={textNode.el.width*-0.5-10} height={textNode.el.height} />
 
   const node = <DOMDummy tag="input"
-    style="font-size: 1px;" ratio={ratio}
+    style="font-size: 1px;"
     onclick={({ target }) => selectAllText(target)}
     oninput={({ target }) => setText(target.value)}
   >
