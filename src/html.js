@@ -14,7 +14,8 @@ class HTMLNode extends Node {
   createAnchor() {
     return createTextNode()
   }
-  applyProp(el, key, value) {
+  applyProp(key, value) {
+    const { el } = this
     if (key in el) {
       el[key] = value
     } else {

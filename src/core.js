@@ -26,9 +26,9 @@ export class Node {
     if (props)
     for (const [key, value] of Object.entries(props)) {
       if (isCompute(value)) {
-        watch(value, (v) => this.applyProp(el, key, v))
+        watch(value, (v) => this.applyProp(key, v))
       } else {
-        this.applyProp(el, key, value)
+        this.applyProp(key, value)
       }
     }
 
@@ -53,8 +53,8 @@ export class Node {
   }
 
   createAnchor() {}
-  applyProp(el, key, value) {
-    el[key] = value
+  applyProp(key, value) {
+    this.el[key] = value
   }
   append(node) {
     this.children.push(node)
