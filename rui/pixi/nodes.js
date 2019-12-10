@@ -12,12 +12,8 @@ export class PIXINode extends BaseNode {
   createAnchor() {
     return new BaseNode(new PIXI.Container(), { foo: 'bar' })
   }
-  createText(text) {
-    throw 'TODO'
-  }
-  updateText(el, text) {
-  }
-  applyProp(el, key, value) {
+  applyProp(key, value) {
+    const { el } = this
     const cur = el[key]
     // anchor
     if (cur instanceof PIXI.Point || cur instanceof PIXI.ObservablePoint) {
