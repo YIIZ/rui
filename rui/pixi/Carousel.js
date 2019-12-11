@@ -1,62 +1,43 @@
 // @jsx h
-import { h, value, compute, replace } from 'rui'
+import { h, value, compute, replace, if as _if } from 'rui'
 import { Container, Sprite, Text } from './nodes'
 
 import { tween } from 'popmotion'
-
-function replaceItem(getNode, fromState, toState) {
-  return replace(() => {
-    const node = getNode()
-    if (!node) return
-
-    const from = fromState()
-    const to = toState()
-    const container = <Container>{node}</Container>
-    function apply(props) {
-      // TODO? cache keys
-      for (const [key, value] of Object.entries(props)) {
-        container.applyProp(key, value)
-      }
-    }
-    apply(from)
-    tween({ from, to, duration: 300 }).start(apply)
-    return container
-  })
-}
+import Animate from './Animate'
 
 // TODO custom animation style
-const defaultStyle = () => ({
-  x: 0,
-  alpha: 1,
-  scale: 1,
-})
-const moveStyle = (left) => ({
-  x: left ? 100 : -100,
-  alpha: 0,
-  scale: 0.8,
-})
+const defaultStyle = { x: 0, alpha: 1, scale: 1 }
+const enterStyle = { x: -140, alpha: 0.5, scale: 0.8 }
+const leaveStyle = { x: 140, alpha: 0.5, scale: 0.8 }
 
 
-export default function Carousel(props, children) {
-  const [index, setIndex] = value(0)
-  const [lastIndex, setLastIndex] = value(-1)
-
-  const enter = compute(() => children[index()])
-  const leave = compute(() => children[lastIndex()])
-
-  let direction = 1
+export default function Carousel({ init = value(0) }, children) {
+  const [index, setIndex] = init
   const update = (d) => {
-    direction = d
-    const lastIndex = index()
-    const newIndex = (lastIndex+d+children.length)%children.length
+    const newIndex = (index()+d+children.length)%children.length
     setIndex(newIndex)
-    setLastIndex(lastIndex)
   }
 
-  const node = <Container>
-    {replaceItem(enter, () => leave() ? moveStyle(direction>0) : defaultStyle(), defaultStyle)}
-    {replaceItem(leave, defaultStyle, () => moveStyle(direction<0))}
-  </Container>
+  const items = children.map((node, i) => {
+    const style = compute(() => {
+      const idx = index()
+      if (i === idx) {
+        return defaultStyle
+      } else if (i > idx) {
+        return leaveStyle
+      } else {
+        return enterStyle
+      }
+    })
+    // TODO without zindex?
+    const zIndex = compute(() => {
+      return i === index() ? 1 : -1
+    })
+    // TODO remove hidden items
+    return <Animate N={Container} animate={style} zIndex={zIndex}>{node}</Animate>
+  })
+
+  const node = <Container sortableChildren>{...items}</Container>
 
   node.next = () => update(1)
   node.prev = () => update(-1)
