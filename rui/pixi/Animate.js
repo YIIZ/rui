@@ -11,6 +11,9 @@ export default function Animate({ N: Node, initial, animate, duration, ease, loo
   const newStyle = isCompute(animate) ? animate : compute(() => animate)
   const node = <Node {...props}>{...children}</Node>
 
+  const [animating, setAnimating] = value(false)
+  const animationDone = () => setAnimating(false)
+
   function apply(props) {
     // TODO? cache keys
     for (const [key, value] of Object.entries(props)) {
@@ -23,9 +26,11 @@ export default function Animate({ N: Node, initial, animate, duration, ease, loo
   watch(newStyle, (style) => {
     if (!lastStyle) {
       lastStyle = style
+      apply(style)
       return
     }
     if (lastAction) lastAction.stop()
+    setAnimating(true)
     const action = tween({
       from: lastStyle,
       to: style,
@@ -33,9 +38,11 @@ export default function Animate({ N: Node, initial, animate, duration, ease, loo
       yoyo,
       loop,
       ease,
-    }).start(apply)
+    }).start({ update: apply, complete: animationDone })
     lastStyle = style
     lastAction = action
   })
+
+  node.animating = animating
   return node
 }
