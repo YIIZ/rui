@@ -1,5 +1,5 @@
 // @jsx h
-import { h, value, compute, replace, hook, watch } from 'rui'
+import { h, value, compute, replace, hook, watch, isCompute } from 'rui'
 import { Container, Sprite, Text } from 'lib/rui/pixi'
 
 import { tween } from 'popmotion'
@@ -7,7 +7,8 @@ import { tween } from 'popmotion'
 // TODO
 // https://codesandbox.io/s/framer-motion-keyframes-ekks8?fontsize=14&module=%2Fsrc%2FExample.tsx
 // TODO direct props and animating it?
-export default function Animate({ N: Node, animate, duration, ease, loop, yoyo, ...props }, children) {
+export default function Animate({ N: Node, initial, animate, duration, ease, loop, yoyo, ...props }, children) {
+  const newStyle = isCompute(animate) ? animate : compute(() => animate)
   const node = <Node {...props}>{...children}</Node>
 
   function apply(props) {
@@ -17,9 +18,9 @@ export default function Animate({ N: Node, animate, duration, ease, loop, yoyo, 
     }
   }
 
-  let lastStyle = null
+  let lastStyle = initial
   let lastAction = null
-  watch(animate, (style) => {
+  watch(newStyle, (style) => {
     if (!lastStyle) {
       lastStyle = style
       return
