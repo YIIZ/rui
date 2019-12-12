@@ -21,7 +21,12 @@ export default function Carousel({ init = value(0) }, children) {
   const items = children.map((node, i) => {
     const style = compute(() => {
       const idx = index()
-      if (i === idx) {
+      // continuous scroll
+      if (idx === 0 && i === children.length-1) {
+        return enterStyle
+      } else if (idx === children.length-1 && i === 0) {
+        return leaveStyle
+      } else if (i === idx) {
         return defaultStyle
       } else if (i > idx) {
         return leaveStyle
@@ -37,7 +42,10 @@ export default function Carousel({ init = value(0) }, children) {
     return <Animate N={Container} animate={style} zIndex={zIndex}>{node}</Animate>
   })
 
-  const node = <Container sortableChildren>{...items}</Container>
+  const node = <Container sortableChildren
+    onpointerdown={(evt) => console.log(evt.data.global)}
+    onpointermove={(evt) => console.log(evt.data.global)}
+  >{...items}</Container>
 
   node.next = () => update(1)
   node.prev = () => update(-1)
