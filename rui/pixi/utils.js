@@ -78,3 +78,33 @@ export function capture(
   return dataURL
 }
 
+
+// TODO better
+export function resetEventTarget(app, getRatio) {
+  // set event target to support event behind capture img
+  const { renderer } = app
+  const { interaction } = renderer.plugins
+  const target = document.body
+  interaction.setTargetElement(target, renderer.resolution)
+  // window.interaction = interaction
+  const { mapPositionToPoint, normalizeToPointerData } = interaction
+
+  interaction.autoPreventDefault = false
+  interaction.normalizeToPointerData = function (event) {
+    // fix: prevent pointerupoutside
+    // https://github.com/pixijs/pixi.js/blob/902d0029617091a1e67a189b245b5bcd39499974/src/interaction/InteractionManager.js#L1249
+    this.interactionDOMElement = event.target
+    return normalizeToPointerData.call(this, event)
+  }
+
+  interaction.mapPositionToPoint = function (point, x, y) {
+    // FIXME?
+    // const { devicePixelRatio } = director
+    // mapPositionToPoint.call(this, point, x, y)
+    // const { resolution, interactionDOMElement } = this
+    // interactionDOMElement.width / interactionDOMElement.clientWidth * resolution
+    // const { ratio } = app
+    point.x = x * getRatio()
+    point.y = y * getRatio()
+  }
+}
