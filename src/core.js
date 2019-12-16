@@ -2,8 +2,7 @@ export * from './compute'
 import { isReplace, isCompute, value } from './compute'
 
 export const watch = (computed, fn) => {
-  // TODO no peek?
-  const onChange = () => fn(computed.peek())
+  const onChange = () => fn(computed())
   hook(() => {
     computed.onChange(onChange)
     // NODE: due to compute's mechanism, retrieve before watch will cause compute double times
@@ -52,7 +51,9 @@ export class Node {
     }
   }
 
-  createAnchor() {}
+  createAnchor() {
+    return new Node()
+  }
   applyProp(key, value) {
     this.el[key] = value
   }

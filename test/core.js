@@ -1,5 +1,5 @@
 import test from 'ava'
-import { Node, h, hook, useRoot } from '../src/core'
+import { Node, h, hook, useRoot, value, if as _if } from '../src/core'
 
 test('basic', t => {
   function App(props, children) {
@@ -81,4 +81,21 @@ test('useRoot', t => {
   }
   app = h(App)
   app.attach()
+})
+
+test('do not re-create in if()', t => {
+  let count = 0
+  const [v, updateV] = value(1)
+  function Child() {
+    v() // use v
+    count += 1
+    return new Node()
+  }
+  function App(props, children) {
+    return new Node(null, null, [_if(true, () => h(Child))])
+  }
+  const app = h(App)
+  app.attach()
+  updateV(2)
+  t.is(count, 1)
 })
