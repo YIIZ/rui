@@ -1,7 +1,6 @@
-// @jsx h
-import { h, compute, useRoot } from 'rui'
+import { compute, useRoot } from 'rui'
 
-export default function Position({ N: Node, left, right, top, bottom, ...props }, children) {
+export default function usePosition({ left, right, top, bottom }) {
   const root = useRoot()
   // TODO relative to parent?
   const size = compute(() => root()?.size?.())
@@ -15,10 +14,9 @@ export default function Position({ N: Node, left, right, top, bottom, ...props }
     : typeof bottom === 'number' ? [1, compute(() => halfHeight() - bottom)]
     : [0.5, 0]
 
-  return <Node
-    anchor={[anchorX, anchorY]}
-    x={x}
-    y={y}
-    {...props}
-  >{...children}</Node>
+  return {
+    anchor: [anchorX, anchorY],
+    x,
+    y,
+  }
 }
