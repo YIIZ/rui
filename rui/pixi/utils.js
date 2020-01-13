@@ -16,6 +16,13 @@ export const oncePointerEnd = (target, handler) => {
   }
   onPointerEnd(target, end)
 }
+export const oncePointerDrag = (target, handler, endHandler) => {
+  target.on('pointermove', handler)
+  oncePointerEnd(target, (...args) => {
+    target.off('pointermove', handler)
+    endHandler(...args)
+  })
+}
 
 // export const awaitTween = playback =>
 
