@@ -1,4 +1,5 @@
 import compute from 'compute-js'
+import { h } from './core'
 
 export function value(inital) {
   const state = compute.value(inital)
@@ -30,24 +31,26 @@ export function replace(value) {
   v.__replace = true
   return v
 }
-export function each(value, fn) {
+export function each(value, Node) {
   // cache value
   // TODO key?
   const v = compute(value)
   return replace(() => {
     const list = v()
-    return peek(() => list.map(fn))
+    // <Node item={item} index={index}/>
+    return peek(() => list.map((item, index) => h(Node, { item, index })))
   })
 }
-function _if(value, fn) {
+function _if(value, Node) {
   const v = compute(value) // any value to compute
   const bool = compute(() => !!v()) // to bool
-  return replace(() => bool() ? peek(fn) : null)
+  // <Node/>
+  return replace(() => bool() ? peek(() => h(Node)) : null)
 }
-export function unless(value, fn) {
+export function unless(value, Node) {
   const v = compute(value)
   const bool = compute(() => !v())
-  return replace(() => bool() ? peek(fn) : null)
+  return replace(() => bool() ? peek(() => h(Node)) : null)
 }
 
 export { _if as if, compute }

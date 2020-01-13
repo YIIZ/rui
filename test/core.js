@@ -99,3 +99,23 @@ test('do not re-create in if()', t => {
   updateV(2)
   t.is(count, 1)
 })
+
+
+test('hook in if()', t => {
+  let showing = false
+  const [show, setShow] = value(false)
+  function App(props, children) {
+    return new Node(null, null, [_if(show, () => {
+      hook(() => {
+        showing = true
+      })
+      return new Node()
+    })])
+  }
+  const app = h(App)
+  app.attach()
+  t.is(showing, false)
+  setShow(true)
+  t.is(showing, true)
+})
+
