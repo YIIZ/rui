@@ -1,7 +1,6 @@
 {
   "name": "lib",
   "version": "0.0.0",
-  "main": "index.js",
   "author": "Bin Xin <rhyzix@gmail.com>",
   "license": "MIT",
   "dependencies": {
