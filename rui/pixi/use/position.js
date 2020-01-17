@@ -1,6 +1,6 @@
 import { compute, useRoot } from 'rui'
 
-export default function usePosition({ left, right, top, bottom }) {
+export function usePosition({ left, right, top, bottom }) {
   const root = useRoot()
   // TODO relative to parent?
   const size = compute(() => root()?.size?.())
