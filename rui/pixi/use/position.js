@@ -1,6 +1,6 @@
 import { compute, useRoot } from 'rui'
 
-export function usePosition({ left, right, top, bottom }) {
+export function usePosition({ left, right, top, bottom }, useAnchor=true) {
   const root = useRoot()
   // TODO relative to parent?
   const size = compute(() => root()?.size?.())
@@ -14,9 +14,11 @@ export function usePosition({ left, right, top, bottom }) {
     : typeof bottom === 'number' ? [1, compute(() => halfHeight() - bottom)]
     : [0.5, 0]
 
-  return {
+  return useAnchor ? {
     anchor: [anchorX, anchorY],
     x,
     y,
+  } : {
+    x, y,
   }
 }
