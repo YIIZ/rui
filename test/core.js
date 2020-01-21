@@ -119,3 +119,17 @@ test('hook in if()', t => {
   t.is(showing, true)
 })
 
+
+test('replace()', t => {
+  function App() {
+    return new Node(null, null, [_if(true, () => new Node('foo'))])
+  }
+  const app = h(App)
+
+  t.is(app.children.length, 1) // anchor
+  t.not(app.children[0].el, 'foo')
+  app.attach()
+  t.is(app.children.length, 1)
+  t.is(app.children[0].el, 'foo')
+})
+

@@ -63,7 +63,7 @@ export class Node {
   }
   replace(oldNodes, newNodes) {
     const { children } = this
-    children.splice(children.indexOf(oldNodes[0])+1, oldNodes.length, ...newNodes)
+    children.splice(children.indexOf(oldNodes[0]), oldNodes.length, ...newNodes)
     if (this.attached) {
       newNodes.forEach(n => n.attach(this.root, this))
       oldNodes.forEach(n => n.detach())
