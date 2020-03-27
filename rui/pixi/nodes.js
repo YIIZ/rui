@@ -22,7 +22,9 @@ export class PIXINode extends BaseNode {
       } else {
         cur.set(value)
       }
-    } else if (key.slice(0, 2) === 'on') {
+    } else if (/^on[a-z]/.test(key)) {
+      // include: onpointertap
+      // exclude: onComplete, onLoop
       // event
       // TODO better?
       const evtName = key.slice(2)
