@@ -80,6 +80,8 @@ function useAni() {
   ani.playing = playing
   return ani
 }
+
+// TODO zero ani error bug
 function useSpringAni(stiffness=170, damping=26/*, mass=1*/) {
   const ani = useAni()
 

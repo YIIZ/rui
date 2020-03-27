@@ -1,9 +1,11 @@
 // @jsx h
 import * as PIXI from 'pixi.js'
-import { h, value, compute } from 'rui'
+import { h, value, compute, watch } from 'rui'
 import { Sprite } from './nodes'
 import Closable from './Closable'
 import Spinner from './Spinner'
+import Mask from './Mask'
+import { useSpringAni } from '.'
 
 export default function Busy(props) {
   const [count, setCount] = value(0)
@@ -12,13 +14,14 @@ export default function Busy(props) {
   const inc = () => setCount(count() + 1)
   const dec = () => setCount(count() - 1)
 
-  const node = <Closable open={open}>
-    <Sprite tex={PIXI.Texture.WHITE}
-      interactive
-      tint={0x000000}
-      alpha={0.8}
-      {...props}
-    ></Sprite>
+
+  const ani = useSpringAni()
+  // TODO DRY
+  const [alive, setAlive] = value(open())
+  watch(compute(() => open() || !!ani.playing()), alive => setAlive(alive))
+
+  const node = <Closable open={alive} alpha={ani(() => open() ? 1 : 0)}>
+    <Mask></Mask>
     <Spinner></Spinner>
   </Closable>
 

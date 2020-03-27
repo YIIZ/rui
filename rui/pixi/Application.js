@@ -33,11 +33,7 @@ function Application({ size, ...props }, children) {
 }
 
 function BusyApplication({ size, ...props }, children) {
-  const busy = <Busy
-    width={compute(() => size().width)}
-    height={compute(() => size().height)}
-  ></Busy>
-
+  const busy = <Busy></Busy>
   const app = <Application size={size} {...props}>
     {...children}
     {busy}
