@@ -30,8 +30,8 @@ export const oncePointerDrag = (target, handler, endHandler) => {
 async function doload(list, onProgress) {
   const loader = PIXI.Loader.shared
 
-  for (const [id, image, metadata] of list) {
-    loader.add(`${id}`, image, { metadata })
+  for (const [id, image, metadata, loadType ] of list) {
+    loader.add(`${id}`, image, { metadata, loadType })
   }
 
   await new Promise((resolve) => {

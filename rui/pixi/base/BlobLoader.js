@@ -2,14 +2,11 @@
 // - multiple images support
 // - pure array data
 // - load image by manual `${id}/${name}`
-import { Loader, SpritesheetLoader, LoaderResource, Rectangle, Texture } from 'pixi.js'
+import { Loader, LoaderResource, Rectangle, Texture } from 'pixi.js'
 
-// TODO batch?
 async function use(resource, next) {
-  const { data, metadata } = resource
-  if (resource.type !== LoaderResource.TYPE.VIDEO
-    || !metadata.blob
-  ) {
+  const { data, loadType } = resource
+  if (resource.loadType !== 'blob') {
     next()
     return
   }
