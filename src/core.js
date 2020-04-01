@@ -92,7 +92,7 @@ export function h(fn, props, ...children) {
   const hooks = []
   stack.push(hooks)
   const node = fn(props || {}, children)
-  node.hooks.push(...hooks)
+  if (hooks.length) node.hooks.push(...hooks)
   stack.pop()
   return node
 }
