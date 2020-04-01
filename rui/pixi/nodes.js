@@ -28,7 +28,7 @@ export class PIXINode extends BaseNode {
       // event
       // TODO better?
       const evtName = key.slice(2)
-      el.interactive = true
+      el.interactive = !!value
       // https://github.com/pixijs/pixi.js/blob/0d830d9ab3b7a45853c5fa0fee60be5edf5d4650/packages/interaction/src/InteractionManager.js#L953
       el[evtName] = value
     } else {
