@@ -1,4 +1,4 @@
-import { compute, useRoot } from 'rui'
+import { compute, useRoot, isCompute } from 'rui'
 
 export function usePosition({ left, right, top, bottom }, useAnchor=true) {
   const root = useRoot()
@@ -7,11 +7,13 @@ export function usePosition({ left, right, top, bottom }, useAnchor=true) {
   const halfWidth = compute(() => size() ? size().width * 0.5 : 0)
   const halfHeight = compute(() => size() ? size().height * 0.5 : 0)
 
-  const [anchorX, x] = typeof left === 'number' ? [0, compute(() => -halfWidth() + left)]
-    : typeof right === 'number' ? [1, compute(() => halfWidth() - right)]
+  const val = v => isCompute(v) ? v() : v
+
+  const [anchorX, x] = left != null ? [0, compute(() => -halfWidth() + val(left))]
+    : right != null ? [1, compute(() => halfWidth() - val(right))]
     : [0.5, 0]
-  const [anchorY, y] = typeof top === 'number' ? [0, compute(() => -halfHeight() + top)]
-    : typeof bottom === 'number' ? [1, compute(() => halfHeight() - bottom)]
+  const [anchorY, y] = top != null ? [0, compute(() => -halfHeight() + val(top))]
+    : bottom != null ? [1, compute(() => halfHeight() - val(bottom))]
     : [0.5, 0]
 
   return useAnchor ? {
