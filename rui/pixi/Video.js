@@ -46,6 +46,11 @@ export default function Video({ src, onEnd, width, height, ...props }) {
   dummy.pause = () => {
     dom.pause()
   }
+  // TODO no reset?
+  dummy.reset = () => {
+    setTime(0)
+    setDuration(Infinity)
+  }
 
   return dummy
 }
