@@ -5,6 +5,16 @@ import { Container } from './nodes'
 
 // items: [['key', Component], ...others]
 // <Component onNext={(nextKey, params, async function callback (enter, leave) => done())}></Component>
+const once = cb => {
+  let called = false
+  return (...args) => {
+    if (called) return
+    called = true
+    return cb(...args)
+  }
+}
+
+
 export default function Switcher({ init }, items) {
   const itemsMap = new Map(items)
   const head = <Container></Container>
@@ -13,9 +23,8 @@ export default function Switcher({ init }, items) {
   let prev, current
   const change = async (name, options, cb) => {
     const { prepend, ...props } = options || {}
-    // TODO once onNext?
     const Node = itemsMap.get(name)
-    const node = <Node onNext={change} {...props}></Node>
+    const node = <Node onNext={once(change)} {...props}></Node>
 
     prev = current
     current = node
