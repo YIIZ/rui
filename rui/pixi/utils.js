@@ -114,4 +114,18 @@ export function resetEventTarget(app, getRatio) {
     point.x = x * getRatio()
     point.y = y * getRatio()
   }
+
+  // FIX PIXI
+  // browsers that not support pointer but support touch&mouse
+  // when not prevent default, will trigger twice
+  // https://github.com/pixijs/pixi.js/blob/902d0029617091a1e67a189b245b5bcd39499974/src/interaction/InteractionManager.js#L737-L755
+  // https://github.com/pixijs/pixi.js/blob/902d0029617091a1e67a189b245b5bcd39499974/src/interaction/InteractionManager.js#L1144
+  if (!interaction.supportsPointerEvents && interaction.supportsTouchEvents) {
+    // https://github.com/pixijs/pixi.js/blob/902d0029617091a1e67a189b245b5bcd39499974/src/interaction/InteractionManager.js#L795-L799
+    window.document.removeEventListener('mousemove', interaction.onPointerMove, true)
+    interaction.interactionDOMElement.removeEventListener('mousedown', interaction.onPointerDown, true)
+    interaction.interactionDOMElement.removeEventListener('mouseout', interaction.onPointerOut, true)
+    interaction.interactionDOMElement.removeEventListener('mouseover', interaction.onPointerOver, true)
+    window.removeEventListener('mouseup', interaction.onPointerUp, true)
+  }
 }
