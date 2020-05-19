@@ -1,5 +1,5 @@
 // @jsx h
-import { Node as BaseNode, h, hook, compute } from 'rui'
+import { Node as BaseNode, h, hook, compute, watch, isCompute } from 'rui'
 
 // TODO treeshaking?
 // import { Container as _Container } from '@pixi/display'
@@ -62,7 +62,15 @@ export function Sprite({ tex, ...props }, children) {
   return new PIXINode(el, props, children)
 }
 
-export function Text({ fontFamily='Arial', fontSize=24, fontWeight=400, fontStyle='normal', fill=0xFFFFFF, ...props }, children) {
+export function Text({
+  fontFamily='Arial',
+  fontSize=24,
+  fontWeight=400,
+  fontStyle='normal',
+  fill=0xFFFFFF,
+  style,
+  ...props
+}, children) {
   const text = compute(() => children.map(c => typeof c === 'function' ? c() : c).join(''))
 
   // TODO no compute call?
@@ -72,7 +80,12 @@ export function Text({ fontFamily='Arial', fontSize=24, fontWeight=400, fontStyl
     fontWeight,
     fontStyle,
     fill,
+    ...style,
   })
   el.anchor.set(0.5)
+
+  // TODO better way
+  if (isCompute(fill)) watch(fill, f => el.style.fill = f)
+
   return new PIXINode(el, { text, ...props })
 }
