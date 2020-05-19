@@ -87,21 +87,18 @@ export class Node {
 }
 
 
-const stack = []
+let hooks
 export function h(fn, props, ...children) {
-  const hooks = []
-  stack.push(hooks)
+  const lastHooks = hooks
+  hooks = []
   const node = fn(props || {}, children)
   if (hooks.length) node.hooks.push(...hooks)
-  stack.pop()
+  hooks = lastHooks
   return node
-}
-function currentHooks() {
-  return stack[stack.length - 1]
 }
 
 export function hook(hook) {
-  currentHooks().push(hook)
+  hooks.push(hook)
 }
 export function useRoot() {
   const [root, setRoot] = value(null)
