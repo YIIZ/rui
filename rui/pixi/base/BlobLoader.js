@@ -1,9 +1,6 @@
-// supports easeljs like slim json format
-// - multiple images support
-// - pure array data
-// - load image by manual `${id}/${name}`
 import { Loader, LoaderResource, Rectangle, Texture } from 'pixi.js'
 
+// TODO use resource-loader's built-in blob type
 async function use(resource, next) {
   const { data, loadType } = resource
   if (resource.loadType !== 'blob') {
