@@ -1,56 +1,128 @@
-import compute from 'compute-js'
-import { h } from './core'
+let current
+class Node extends Set {
+  constructor(taker, collectDependencies=false) {
+    super()
+    this.taker = taker
+    this.value = undefined
+    this.needUpdate = false
+    this.dependencies = collectDependencies ? new Set() : false
+  }
+  update() {
+    const { dependencies: oldDeps } = this
 
-export function value(inital) {
-  const state = compute.value(inital)
-  return [state, state.set]
-}
-export function isCompute(v) {
-  return v && typeof v.computeName === 'string'
-}
-export function isReplace(v) {
-  return isCompute(v) && v.__replace
+    if (oldDeps) {
+      this.dependencies = new Set()
+    }
+
+    const prev = current
+    current = this
+    const newValue = this.taker()
+    current = prev
+
+    if (oldDeps) {
+      const newDeps = this.dependencies
+      oldDeps.forEach(dep => {
+        if (!newDeps.has(dep)) dep.delete(this)
+      })
+    }
+
+    if (this.value !== newValue) {
+      this.value = newValue
+      this.forEach(d => d.needUpdate = true)
+    }
+    this.needUpdate = false
+  }
+  eval() {
+    if (current && current.dependencies) {
+      current.dependencies.add(this)
+      if (!this.has(current)) {
+        this.add(current)
+      }
+    }
+    return this.size > 0 ? this.value : this.taker()
+  }
+  add(node) {
+    super.add(node)
+    if (this.size === 1) {
+      this.update()
+      if (this.onStart) this.onStart()
+    }
+  }
+  delete(node) {
+    super.delete(node)
+    if (this.size === 0) {
+      if (this.dependencies) {
+        this.dependencies.forEach(d => d.delete(this))
+      }
+      if (this.onStop) this.onStop()
+    }
+  }
 }
 
-// call function without dependencies
-// c.peek() not working, c's deps will bind to c's parent
-export function peek(fn) {
-  const c = compute(fn)
-  const tmp = () => {}
-  c.onChange(tmp)
-  const out = c()
-  c.offChange(tmp)
-  return out
-}
 
-
-// convenience methods
-export function replace(value) {
-  // TODO `dep()` in compute
-  const v = compute(value)
-  v.__replace = true
-  return v
+const sort = (node, set) => {
+  // topological order
+  // move repeat to end
+  set.delete(node)
+  set.add(node)
+  node.forEach(child => sort(child, set))
+  return set
 }
-export function each(value, Node) {
-  // cache value
-  // TODO key?
-  const v = compute(value)
-  return replace(() => {
-    const list = v()
-    // <Node item={item} index={index}/>
-    return peek(() => list.map((item, index) => h(Node, { item, index })))
+const notify = (nodes) => {
+  const topologicalNodes = new Set()
+  nodes.forEach(node => {
+    node.needUpdate = true
+    sort(node, topologicalNodes)
+  })
+  topologicalNodes.forEach(node => {
+    if (node.needUpdate) {
+      node.update()
+    }
   })
 }
-function _if(value, Node) {
-  const v = compute(value) // any value to compute
-  const bool = compute(() => !!v()) // to bool
-  // <Node/>
-  return replace(() => bool() ? peek(() => h(Node)) : null)
-}
-export function unless(value, Node) {
-  const v = compute(value)
-  const bool = compute(() => !v())
-  return replace(() => bool() ? peek(() => h(Node)) : null)
+
+const batchNodes = new Set()
+const batchNotify = async (node) => {
+  batchNodes.add(node)
+  await 0
+  if (batchNodes.size > 0) {
+    notify([...batchNodes])
+    batchNodes.clear()
+  }
 }
 
-export { _if as if, compute }
+export const take = (taker, subscriber) => {
+  const node = new Node(taker)
+
+  let unsubscriber
+  node.onStart = () => {
+    // unsubscriber = subscriber(() => notify([node]))
+    unsubscriber = subscriber(() => batchNotify(node))
+  }
+  node.onStop = () => {
+    unsubscriber && unsubscriber()
+  }
+  return () => node.eval()
+}
+
+export const compute = (taker) => {
+  const node = new Node(taker, true)
+  return () => node.eval()
+}
+
+export const value = (init) => {
+  let v = init
+  const node = new Node(() => v)
+  const update = (newValue) => {
+    v = newValue
+    batchNotify(node)
+  }
+  return [() => node.eval(), update]
+}
+
+export const watch = (fn) => {
+  const node = new Node(fn, true)
+  node.update()
+  return () => node.delete()
+}
+
