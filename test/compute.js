@@ -1,4 +1,5 @@
 import test from 'ava'
+import { fake } from 'sinon'
 import { take, compute, value, watch } from '../src/compute'
 
 test('take basic', t => {
@@ -7,7 +8,6 @@ test('take basic', t => {
     return state += 1
   }, () => {
     t.fail()
-    return () => {}
   })
 
   t.is(get(), 1)
@@ -15,57 +15,42 @@ test('take basic', t => {
 })
 
 test('take without watch will not cache value', t => {
-  t.plan(3)
-  const get = take(() => {
-    t.pass()
-  }, () => {
-    t.fail()
-    return () => {}
-  })
+  const fn = fake()
+  const get = take(fn, () => t.fail())
   get()
   get()
   get()
+
+  t.is(fn.callCount, 3)
 })
 
 test('take with watch will cache value', t => {
-  t.plan(2)
-  const get = take(() => {
-    t.pass()
-  }, () => {
-    t.pass()
-    return () => {}
-  })
-  watch(() => get())
+  const taker = fake()
+  const subscriber = fake()
+  const get = take(taker, subscriber)
+  const unwatch = watch(() => get())
   get()
   get()
   get()
+
+  t.is(taker.callCount, 1)
+  t.true(subscriber.called)
+
+  unwatch()
 })
 
-test('watch', t => {
-  let watching = false
+test('watch and unwatch', t => {
+  const subscriber = fake()
+  const unsubscriber = fake()
   const v = take(() => 1, () => {
-    watching = true
-    return () => {
-      watching = false
-    }
+    subscriber()
+    return unsubscriber
   })
   const unwatch = watch(() => v())
-  t.true(watching)
+  t.true(subscriber.called)
+  t.false(unsubscriber.called)
   unwatch()
-  t.false(watching)
-})
-
-
-test('unwatch', t => {
-  t.plan(2)
-  const v = take(() => {}, () => {
-    t.pass()
-    return () => {
-      t.pass()
-    }
-  })
-  const unwatch = watch(() => v())
-  unwatch()
+  t.true(unsubscriber.called)
 })
 
 test('value basic', async t => {
@@ -116,19 +101,20 @@ test('compute change dep', async t => {
 })
 
 test('batch', async t => {
-  t.plan(3)
+  const sumFn = fake()
   const values = [value(1), value(2), value(3)]
 
   let answer = 6
   const sum = compute(() => {
-    t.pass()
+    sumFn()
     return values.reduce((acc, [v]) => acc+v(), 0)
   })
 
   const unwatch = watch(sum) // first sum
   values.forEach(([v, set]) => set(v()+1)) // second sum
   await 0
-  t.is(sum(), 9) // third assert
+  t.is(sum(), 9)
+  t.is(sumFn.callCount, 2)
   unwatch()
 })
 
@@ -145,23 +131,155 @@ test('compute cache', async t => {
 
 
 test('watch by multiple dependents', t => {
-  t.plan(3)
-  let watching = false
-  const v = take(() => {
-    t.pass()
-    return 1
-  }, () => {
-    watching = true
-    return () => {
-      watching = false
-    }
+  const taker = fake()
+  const subscriber = fake()
+  const unsubscriber = fake()
+
+  const v = take(taker, () => {
+    subscriber()
+    return unsubscriber
   })
   const c1 = compute(v)
   const c2 = compute(v)
 
-  const unwatch = watch(() => c1()+c2())
-  t.true(watching)
+  const unwatch1 = watch(() => c1()+c2())
+  const unwatch2 = watch(() => c2())
+  t.is(subscriber.callCount, 1)
+  t.is(unsubscriber.callCount, 0)
+  unwatch1()
+  t.is(unsubscriber.callCount, 0)
+  unwatch2()
+  t.is(subscriber.callCount, 1)
+  t.is(unsubscriber.callCount, 1)
+  t.is(taker.callCount, 1)
+})
+
+test('simple executing order', async t => {
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v = (a.v || 0) + 1
+  }, (u) => {
+    a.update = u
+  })
+  const b = compute(() => {
+    result.push('b')
+    return a()
+  })
+  const c = compute(() => {
+    result.push('c')
+    return a()+b()
+  })
+
+  const unwatch = watch(c)
+  result = []
+  a.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'c'])
   unwatch()
-  t.false(watching)
+})
+
+test('complex executing order', async t => {
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v = (a.v || 0) + 1
+  }, (u) => {
+    a.update = u
+  })
+  const b = compute(() => {
+    result.push('b')
+    return a()
+  })
+  const c = compute(() => {
+    result.push('c')
+    return a()
+  })
+  const d = compute(() => {
+    result.push('d')
+    return c()
+  })
+  const e = compute(() => {
+    result.push('e')
+    return b() + d()
+  })
+
+  const unwatch = watch(e)
+  result = []
+  a.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'c', 'd', 'e'])
+  unwatch()
+})
+
+test('complex executing order with skip', async t => {
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v = (a.v || 0) + 1
+  }, (u) => {
+    a.update = u
+  })
+  const b = compute(() => {
+    result.push('b')
+    return a()
+  })
+  const c = compute(() => {
+    result.push('c')
+    return a()*0
+  })
+  const d = compute(() => {
+    result.push('d')
+    return c()
+  })
+  const e = compute(() => {
+    result.push('e')
+    return b() + d()
+  })
+
+  const unwatch = watch(e)
+  result = []
+  a.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'c', 'e'])
+
+  unwatch()
+})
+
+test('executing order with batch', async t => {
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v = (a.v || 0) + 1
+  }, (u) => {
+    a.update = u
+  })
+  const b = take(() => {
+    result.push('b')
+    return b.v = (b.v || 0) + 1
+  }, (u) => {
+    b.update = u
+  })
+  const c = compute(() => {
+    result.push('c')
+    return b()
+  })
+  const d = compute(() => {
+    result.push('d')
+    return a() + c()
+  })
+
+  const unwatch = watch(d)
+  result = []
+  a.update()
+  b.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'c', 'd'])
+
+  unwatch()
 })
 
