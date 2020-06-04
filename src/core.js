@@ -1,19 +1,5 @@
 export * from './compute'
-import { isReplace, isCompute, value } from './compute'
-
-export const watch = (computed, fn) => {
-  const onChange = () => fn(computed())
-  hook(() => {
-    computed.onChange(onChange)
-    // NODE: due to compute's mechanism, retrieve before watch will cause compute double times
-    // eg. {_if(v, () => <Large/>)}
-    // will init `<Large/>` in initialization and attach phase
-    // so we currently only retrieve value after attach
-    onChange()
-    return () => computed.offChange(onChange)
-  })
-}
-
+import { value, compute, watch, peek } from './compute'
 
 export class Node {
   constructor(el, props, children) {
@@ -24,8 +10,8 @@ export class Node {
 
     if (props)
     for (const [key, value] of Object.entries(props)) {
-      if (isCompute(value)) {
-        watch(value, (v) => this.applyProp(key, v))
+      if (typeof value === 'function') {
+        apply(() => this.applyProp(key, value()))
       } else {
         this.applyProp(key, value)
       }
@@ -33,20 +19,19 @@ export class Node {
 
     if (children)
     for (const child of children) {
-      if (!isReplace(child)) {
-        // TODO check instanceof Node?
-        this.append(child)
-      } else {
+      if (typeof child === 'function') {
         const anchor = this.createAnchor()
         this.append(anchor)
 
         let nodes = [anchor]
-        watch(child, (v) => {
-          // v[Symbol.iterator]?
+        apply(() => {
+          const v = child()
           const newNodes = Array.isArray(v) ? v : v != null ? [v] : [anchor]
           // TODO prevent first replace?
           nodes = this.replace(nodes, newNodes)
         })
+      } else {
+        this.append(child)
       }
     }
   }
@@ -91,7 +76,8 @@ let hooks
 export function h(fn, props, ...children) {
   const lastHooks = hooks
   hooks = []
-  const node = fn(props || {}, children)
+  // TODO peek in if/each?
+  const node = peek(fn, props || {}, children)
   if (hooks.length) node.hooks.push(...hooks)
   hooks = lastHooks
   return node
@@ -100,6 +86,11 @@ export function h(fn, props, ...children) {
 export function hook(hook) {
   hooks.push(hook)
 }
+export const apply = (fn) => {
+  hook(() => watch(fn))
+}
+
+
 export function useRoot() {
   const [root, setRoot] = value(null)
   hook((self) => {
@@ -108,4 +99,29 @@ export function useRoot() {
   })
   return root
 }
+
+
+// convenience methods
+export function each(value, Node) {
+  // cache value
+  // TODO key?
+  return compute(() => {
+    // <Node item={item} index={index}/>
+    return value().map((item, index) => h(Node, { item, index }))
+  })
+}
+function _if(value, Node) {
+  const bool = typeof value === 'function'
+    ? compute(() => !!value()) // cache bool
+    : () => value
+  return compute(() => bool() ? h(Node) : null)
+}
+export function unless(value, Node) {
+  const bool = typeof value === 'function'
+    ? compute(() => !value()) // cache bool
+    : () => value
+  return compute(() => bool() ? h(Node) : null)
+}
+
+export { _if as if, compute as replace }
 

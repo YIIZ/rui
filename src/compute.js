@@ -126,3 +126,11 @@ export const watch = (fn) => {
   return () => node.delete()
 }
 
+export const peek = (fn, ...args) => {
+  const prev = current
+  current = null
+  const out = fn(...args)
+  current = prev
+  return out
+}
+

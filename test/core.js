@@ -1,4 +1,5 @@
 import test from 'ava'
+import { fake } from 'sinon'
 import { Node, h, hook, useRoot, value, if as _if } from '../src/core'
 
 test('basic', t => {
@@ -101,7 +102,7 @@ test('do not re-create in if()', t => {
 })
 
 
-test('hook in if()', t => {
+test('hook in if()', async t => {
   let showing = false
   const [show, setShow] = value(false)
   function App(props, children) {
@@ -116,6 +117,7 @@ test('hook in if()', t => {
   app.attach()
   t.is(showing, false)
   setShow(true)
+  await 0
   t.is(showing, true)
 })
 
