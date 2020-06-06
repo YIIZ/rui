@@ -1,5 +1,5 @@
 export * from './compute'
-import { value, compute, watch, peek } from './compute'
+import { value, compute, watch, peek, isCompute } from './compute'
 
 export class Node {
   constructor(el, props, children) {
@@ -10,7 +10,9 @@ export class Node {
 
     if (props)
     for (const [key, value] of Object.entries(props)) {
-      if (typeof value === 'function') {
+      // next?
+      // const applyProp = this.createApply(key)
+      if (isCompute(value)) {
         apply(() => this.applyProp(key, value()))
       } else {
         this.applyProp(key, value)
@@ -19,7 +21,7 @@ export class Node {
 
     if (children)
     for (const child of children) {
-      if (typeof child === 'function') {
+      if (isCompute(child)) {
         const anchor = this.createAnchor()
         this.append(anchor)
 
@@ -103,11 +105,12 @@ export function useRoot() {
 
 // convenience methods
 export function each(value, Node) {
+  const items = typeof value === 'function' ? value : () => value
   // cache value
   // TODO key?
   return compute(() => {
     // <Node item={item} index={index}/>
-    return value().map((item, index) => h(Node, { item, index }))
+    return items().map((item, index) => h(Node, { item, index }))
   })
 }
 function _if(value, Node) {

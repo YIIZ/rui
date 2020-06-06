@@ -6,6 +6,10 @@ class Node extends Set {
     this.value = undefined
     this.needUpdate = false
     this.dependencies = collectDependencies ? new Set() : false
+
+    const boundEval = this.eval.bind(this)
+    boundEval.__compute = true
+    this.boundEval = boundEval
   }
   update() {
     const { dependencies: oldDeps } = this
@@ -102,12 +106,12 @@ export const take = (taker, subscriber) => {
   node.onStop = () => {
     unsubscriber && unsubscriber()
   }
-  return () => node.eval()
+  return node.boundEval
 }
 
 export const compute = (taker) => {
   const node = new Node(taker, true)
-  return () => node.eval()
+  return node.boundEval
 }
 
 export const value = (init) => {
@@ -117,13 +121,17 @@ export const value = (init) => {
     v = newValue
     batchNotify(node)
   }
-  return [() => node.eval(), update]
+  return [node.boundEval, update]
 }
 
 export const watch = (fn) => {
   const node = new Node(fn, true)
   node.update()
   return () => node.delete()
+}
+
+export const isCompute = (fn) => {
+  return fn.__compute === true
 }
 
 export const peek = (fn, ...args) => {
