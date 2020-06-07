@@ -131,7 +131,7 @@ export const watch = (fn) => {
 }
 
 export const isCompute = (fn) => {
-  return fn.__compute === true
+  return typeof fn === 'function' && fn.__compute === true
 }
 
 export const peek = (fn, ...args) => {
