@@ -92,6 +92,14 @@ export const apply = (fn) => {
   hook(() => watch(fn))
 }
 
+const deprecatedWatch = (get, cb) => {
+  apply(() => {
+    const v = get()
+    // cb(get())
+    peek(cb, v)
+  })
+}
+export { deprecatedWatch as watch }
 
 export function useRoot() {
   const [root, setRoot] = value(null)
