@@ -86,12 +86,24 @@ const notify = (nodes) => {
 }
 
 const batchNodes = new Set()
-const batchNotify = async (node) => {
+export let batching = true
+const batchNotify = (node) => {
+  if (!batching) {
+    // sync: trigger maximum call stack error if circular
+    notify([node])
+    return
+  }
   batchNodes.add(node)
-  await 0
-  if (batchNodes.size > 0) {
-    notify([...batchNodes])
-    batchNodes.clear()
+  if (batchNodes.size === 1) {
+    return Promise.resolve().then(() => {
+      batching = false
+      try {
+        notify([...batchNodes])
+      } finally {
+        batchNodes.clear()
+        batching = true
+      }
+    })
   }
 }
 
@@ -119,7 +131,7 @@ export const value = (init) => {
   const node = new Node(() => v)
   const update = (newValue) => {
     v = newValue
-    batchNotify(node)
+    return batchNotify(node)
   }
   return [node.boundEval, update]
 }
