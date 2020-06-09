@@ -13,6 +13,7 @@ export default function Mask(props) {
     height={compute(() => size()?.height)}
     tint={0x000000}
     alpha={0.8}
+    interactive
     {...props}
   />
 }
