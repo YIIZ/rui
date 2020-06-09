@@ -1,14 +1,12 @@
-import { value, compute } from 'rui'
+import { take, compute } from 'rui'
 
-export const useWindowSize = () => {
-  const [dep, change] = value(true)
-  window.addEventListener('resize', () => change(!dep()))
-  return compute(() => {
-    dep()
-    const { clientWidth, clientHeight } = document.documentElement
-    return [clientWidth, clientHeight]
-  })
-}
+export const useWindowSize = () => take(() => {
+  const { clientWidth, clientHeight } = document.documentElement
+  return [clientWidth, clientHeight]
+}, update => {
+  window.addEventListener('resize', update)
+  return () => window.removeEventListener('resize', update)
+})
 
 export const useRotateSize = (landscape=true) => {
   const portrait = !landscape
