@@ -8,8 +8,26 @@ import DOMDummy from './DOMDummy'
 
 export default function Video({ src, onEnd, width, height, ...props }) {
   const [time, setTime] = value(0)
+  const [playing, setPlaying] = value(false)
   const [duration, setDuration] = value(Infinity)
   const remain = compute(() => duration() - time())
+
+
+  const onplaying = () => {
+    const check = everyFrame().start(() => {
+      if (dom.paused) {
+        check.stop()
+        return
+      }
+      if (dom.currentTime >= 0.1) {
+        check.stop()
+        setPlaying(true)
+      }
+    })
+  }
+  const onpause = () => {
+    setPlaying(false)
+  }
 
   // Container has no size
   const node = <Container {...props}><Sprite width={width} height={height}></Sprite></Container>
@@ -24,17 +42,22 @@ export default function Video({ src, onEnd, width, height, ...props }) {
     onended={onEnd}
     ondurationchange={() => setDuration(dom.duration)}
     ontimeupdate={() => setTime(dom.currentTime)}
+    onplaying={onplaying}
+    onpause={onpause}
   >
     {node}
   </DOMDummy>
   const { dom } = dummy
 
+  dummy.playing = playing
   dummy.time = time
   dummy.duration = duration
   dummy.remain = remain
   dummy.play = async () => {
     dom.play()
     await new Promise((resolve) => {
+      // TODO bug, play and pause
+      // merge onplaying
       const check = everyFrame().start(() => {
         if (dom.currentTime >= 0.1) {
           check.stop()
