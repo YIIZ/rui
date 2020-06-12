@@ -41,3 +41,10 @@ export const useAppSize = (designWidth=750, designHeight=1500) => {
     }
   })
 }
+
+
+export const hash = take(() => location.hash.slice(1), update => {
+  window.addEventListener('hashchange', update)
+  return () => window.removeEventListener('hashchange', update)
+})
+
