@@ -22,13 +22,15 @@ export class Node {
     if (children)
     for (const child of children) {
       if (isCompute(child)) {
-        const anchor = this.createAnchor()
-        this.append(anchor)
+        const anchor = [this.createAnchor()]
+        this.append(anchor[0])
 
-        let nodes = [anchor]
+        let nodes = anchor
         apply(() => {
           const v = child()
-          const newNodes = Array.isArray(v) ? v : v != null ? [v] : [anchor]
+          const newNodes = Array.isArray(v)
+            ? v.length > 0 ? v : anchor
+            : v != null ? [v] : anchor
           // TODO prevent first replace?
           nodes = this.replace(nodes, newNodes)
         })
