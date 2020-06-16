@@ -1,6 +1,5 @@
 export * from './compute'
 import { value, compute, watch, peek, isCompute } from './compute'
-
 export class Node {
   constructor(el, props, children) {
     this.attached = false
@@ -54,8 +53,9 @@ export class Node {
     const { children } = this
     children.splice(children.indexOf(oldNodes[0]), oldNodes.length, ...newNodes)
     if (this.attached) {
-      newNodes.forEach(n => n.attach(this.root, this))
+      // TODO skip exists?
       oldNodes.forEach(n => n.detach())
+      newNodes.forEach(n => n.attach(this.root, this))
     }
     return newNodes
   }
