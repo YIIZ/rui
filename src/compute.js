@@ -48,8 +48,8 @@ class Node extends Set {
   add(node) {
     super.add(node)
     if (this.size === 1) {
-      this.update()
       if (this.onStart) this.onStart()
+      this.update()
     }
   }
   delete(node) {
