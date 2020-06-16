@@ -100,6 +100,7 @@ const deprecatedWatch = (get, cb) => {
   })
 }
 export { deprecatedWatch as watch }
+export { watch as computeWatch }
 
 export function useRoot() {
   const [root, setRoot] = value(null)
