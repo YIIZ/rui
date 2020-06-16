@@ -55,6 +55,7 @@ class Node extends Set {
   delete(node) {
     super.delete(node)
     if (this.size === 0) {
+      this.needUpdate = false // fix unwatch while notify
       if (this.dependencies) {
         this.dependencies.forEach(d => d.delete(this))
       }

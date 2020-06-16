@@ -283,3 +283,71 @@ test('executing order with batch', async t => {
   unwatch()
 })
 
+
+test('unwatch while notify', async t => {
+  // a>b
+  // |>c>d
+  const callc = fake()
+  const calld = fake()
+
+  let unwatchd
+  const [a, set] = value('watchd')
+  const unwatchb = watch(() => {
+    if (a() === 'stopwatchd') unwatchd()
+  })
+
+  const c = compute(() => {
+    callc(a())
+    return a()
+  })
+  unwatchd = watch(() => {
+    calld(c())
+  })
+
+  t.is(callc.callCount, 1)
+  t.is(calld.callCount, 1)
+  t.is(callc.lastCall.firstArg, 'watchd')
+  t.is(calld.lastCall.firstArg, 'watchd')
+
+  set('stopwatchd')
+  await 0
+  t.is(callc.callCount, 1)
+  t.is(calld.callCount, 1)
+  unwatchb()
+})
+
+
+test('change depdendency while notify', async t => {
+  // a>b>d
+  // |>c>|
+  const callb = fake()
+  const callc = fake()
+  const calld = fake()
+
+  const [a, set] = value('watchc')
+  const b = compute(() => {
+    callb(a())
+    return a()
+  })
+  const c = compute(() => {
+    callc(a())
+    return a()
+  })
+  const unwatchd = watch(() => {
+    calld()
+    if (b() === 'watchc') {
+      c()
+    }
+  })
+
+  t.is(callb.callCount, 1)
+  t.is(callc.callCount, 1)
+  t.is(calld.callCount, 1)
+  set('stopwatchc')
+  await 0
+  t.is(callb.callCount, 2)
+  // TODO? t.is(callc.callCount, 1)
+  t.is(callc.callCount, 2)
+  t.is(calld.callCount, 2)
+  unwatchd()
+})
