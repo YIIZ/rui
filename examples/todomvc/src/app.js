@@ -1,12 +1,14 @@
 // @jsx h
-import { compute, value, hook, if as _if, each } from 'rui'
+import { take, compute, value, hook, if as _if, each, apply } from 'rui'
 import h from './h'
-import { useHash } from './platform'
 
 import Item from './Item'
 import Footer from './Footer'
 
-window.compute = require('compute-js')
+const hash = take(() => location.hash.slice(1), update => {
+  window.addEventListener('hashchange', update)
+  return () => window.removeEventListener('hashchange', update)
+})
 
 class ItemData {
   constructor(text) {
@@ -27,12 +29,11 @@ function App() {
   const [title, setTitle] = value('')
   const [editing, setEditing] = value()
 
-  const hash = useHash()
   const route = compute(() => hash().slice(1)) // strip /
   const displayTodos = compute(() => {
-    if (route() === '') return todos()
     if (route() === 'active') return todos().filter(todo => !todo.completed())
     if (route() === 'completed') return todos().filter(todo => todo.completed())
+    return todos()
   })
 
   const activeTodoCount = compute(() => {
@@ -40,7 +41,6 @@ function App() {
   })
 
   const completedCount = compute(() => todos().length - activeTodoCount())
-
 
   const onkeydown = (evt) => {
     if (evt.code !== 'Enter') return
@@ -54,6 +54,7 @@ function App() {
   const cancel = () => setEditing(null)
   const save = (todo, newVal) => {
     console.log(`save ${todo.id}: ${newVal}`)
+    console.log(todo)
     todo.setTitle(newVal)
     setEditing(null)
   }
@@ -84,7 +85,7 @@ function App() {
         oninput={({ target }) => setTitle(target.value)}
       />
     </header>
-    {_if(() => displayTodos().length > 0, () => {
+    {_if(() => todos().length > 0, () => {
       console.log('render main')
       return <section className="main">
         <input
@@ -98,7 +99,7 @@ function App() {
           htmlFor="toggle-all"
         />
         <ul className="todo-list">
-          {each(displayTodos, todo => <Item
+          {each(displayTodos, ({ item: todo, index }) => <Item
             key={todo.id}
             todo={todo}
             onToggle={() => toggle(todo)}
@@ -117,7 +118,7 @@ function App() {
       return <Footer
         count={activeTodoCount}
         completedCount={completedCount}
-        nowShowing={hash}
+        nowShowing={route}
         onClearCompleted={clearCompleted}
       />
     })}

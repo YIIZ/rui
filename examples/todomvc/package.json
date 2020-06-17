@@ -35,7 +35,7 @@
     "webpack-dev-server": "latest"
   },
   "dependencies": {
-    "compute-js": "iamnoah/compute-js",
+    "rui": "../../",
     "todomvc-app-css": "^2.2.0",
     "todomvc-common": "^1.0.5"
   }

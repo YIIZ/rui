@@ -3,10 +3,6 @@ const webpack = require('webpack')
 
 module.exports = {
   context: `${__dirname}/src`,
-  resolve: {
-    symlinks: false,
-    modules: ['src', 'node_modules'],
-  },
   entry: {
     app: './app.js',
   },

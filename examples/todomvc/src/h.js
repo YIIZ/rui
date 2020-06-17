@@ -1,6 +1,6 @@
 // @jsx h
 import { h } from 'rui'
-import { Element } from 'rui/html'
+import { Element } from 'rui/src/html'
 
 export default function buildWithString(Tag, props, ...children) {
   return typeof Tag === 'string'
