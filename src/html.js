@@ -31,7 +31,7 @@ class HTMLNode extends Node {
     const newNodes = _newNodes.map(toNode)
 
     const container = this.el
-    const ref = oldNodes[oldNodes.length-1].nextSibling
+    const ref = oldNodes[oldNodes.length-1].el.nextSibling
     oldNodes.forEach(({ el }) => container.removeChild(el))
     newNodes.forEach(({ el }) => container.insertBefore(el, ref))
     return super.replace(oldNodes, newNodes)
