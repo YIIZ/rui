@@ -1,5 +1,5 @@
 let current
-class Node extends Set {
+export class Node extends Set {
   constructor(taker, collectDependencies=false) {
     super()
     this.taker = taker
@@ -12,7 +12,6 @@ class Node extends Set {
     this.boundEval = boundEval
   }
   update() {
-    this.needUpdate = false
     const { dependencies: oldDeps } = this
 
     if (oldDeps) {
@@ -34,15 +33,18 @@ class Node extends Set {
     if (this.value !== newValue) {
       this.value = newValue
       this.forEach(d => d.needUpdate = d !== current)
-      this.forEach(d => d.needUpdate && d.update())
+      this.forEach(d => d.checkUpdate())
     }
   }
   checkUpdate() {
+    if (!this.potentialUpdate) return
     if (this.needUpdate) {
+      this.needUpdate = false
+      this.potentialUpdate = false
       this.update()
     } else if (this.dependencies) {
-      // TODO skip unchanged
       this.dependencies.forEach(d => d.checkUpdate())
+      this.potentialUpdate = false
     }
   }
   eval() {
@@ -78,21 +80,28 @@ class Node extends Set {
 }
 
 
-const notify = (nodes) => {
-  nodes.forEach(node => {
-    node.needUpdate = true
-  })
-  nodes.forEach(node => {
-    node.checkUpdate()
-  })
+const collect = (n, set, condition) => {
+  if (condition(n)) {
+    set.add(n)
+    n.forEach(n => collect(n, set, condition))
+  }
+  return set
 }
 
 const batchNodes = new Set()
+const potentialUpdates = new Set()
 export let batching = true
 const batchNotify = (node) => {
+  node.needUpdate = true
+  collect(node, potentialUpdates, n => {
+    const { potentialUpdate } = n
+    if (!potentialUpdate) n.potentialUpdate = true
+    return !potentialUpdate
+  })
+
   if (!batching) {
     // sync: trigger maximum call stack error if circular
-    notify([node])
+    node.checkUpdate()
     return
   }
   batchNodes.add(node)
@@ -100,10 +109,13 @@ const batchNotify = (node) => {
     return Promise.resolve().then(() => {
       batching = false
       try {
-        notify([...batchNodes])
+        batchNodes.forEach(n => n.checkUpdate())
       } finally {
         batchNodes.clear()
         batching = true
+        // clean
+        potentialUpdates.forEach(n => n.potentialUpdate = false)
+        potentialUpdates.clear()
       }
     })
   }

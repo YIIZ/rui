@@ -118,6 +118,18 @@ test('batch', async t => {
   unwatch()
 })
 
+test('visit expired value while batching', async t => {
+  const [a, set] = value(0)
+
+  const unwatch = watch(a)
+  t.is(a(), 0)
+  set(1)
+  // await 0
+  t.is(a(), 1)
+  unwatch()
+})
+
+
 test('compute cache', async t => {
   t.plan(1)
   const [v, setV] = value(1)
@@ -285,6 +297,48 @@ test('executing order with batch', async t => {
   b.update()
   await 0
   t.deepEqual(result, ['a', 'd', 'b', 'c'])
+
+  unwatch()
+})
+
+test('executing order with circular updating(unchanged)', async t => {
+  // a-->b
+  // |>c|<*d
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v
+  }, (u) => {
+    a.update = u
+  })
+  const d = take(() => {
+    result.push('d')
+    return d.v
+  }, (u) => {
+    d.update = u
+  })
+  const b = compute(() => {
+    result.push('b')
+    // d.v = Date.now() // unchanged
+    d.update && d.update() // circular update
+    return a() + c()
+  })
+  const c = compute(() => {
+    result.push('c')
+    return a() + d()
+  })
+
+  a.v = 1
+  d.v = 1
+
+  const unwatch = watch(b)
+  result = []
+  a.v = 2
+  a.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'd', 'c'])
+  t.is(b(), 5)
 
   unwatch()
 })
