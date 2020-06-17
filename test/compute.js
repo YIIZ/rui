@@ -120,12 +120,15 @@ test('batch', async t => {
 
 test('visit expired value while batching', async t => {
   const [a, set] = value(0)
+  const b = compute(() => a())
 
-  const unwatch = watch(a)
-  t.is(a(), 0)
+  const unwatch = watch(b)
+  t.is(b(), 0)
   set(1)
-  // await 0
-  t.is(a(), 1)
+  t.is(b(), 1)
+  set(2)
+  await 0
+  t.is(b(), 2)
   unwatch()
 })
 
