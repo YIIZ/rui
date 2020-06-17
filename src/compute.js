@@ -1,5 +1,5 @@
 let current
-class Node extends Set {
+export class Node extends Set {
   constructor(taker, collectDependencies=false) {
     super()
     this.taker = taker
@@ -32,9 +32,20 @@ class Node extends Set {
 
     if (this.value !== newValue) {
       this.value = newValue
-      this.forEach(d => d.needUpdate = true)
+      this.forEach(d => d.needUpdate = d !== current)
+      this.forEach(d => d.checkUpdate())
     }
-    this.needUpdate = false
+  }
+  checkUpdate() {
+    if (!this.potentialUpdate) return
+    if (this.needUpdate) {
+      this.needUpdate = false
+      this.potentialUpdate = false
+      this.update()
+    } else if (this.dependencies) {
+      this.dependencies.forEach(d => d.checkUpdate())
+      this.potentialUpdate = false
+    }
   }
   eval() {
     if (current && current.dependencies) {
@@ -43,7 +54,12 @@ class Node extends Set {
         this.add(current)
       }
     }
-    return this.size > 0 ? this.value : this.taker()
+    if (this.size > 0) {
+      this.checkUpdate()
+      return this.value
+    } else {
+      return this.taker()
+    }
   }
   add(node) {
     super.add(node)
@@ -55,7 +71,6 @@ class Node extends Set {
   delete(node) {
     super.delete(node)
     if (this.size === 0) {
-      this.needUpdate = false // fix unwatch while notify
       if (this.dependencies) {
         this.dependencies.forEach(d => d.delete(this))
       }
@@ -65,33 +80,28 @@ class Node extends Set {
 }
 
 
-const sort = (node, set) => {
-  // topological order
-  // move repeat to end
-  set.delete(node)
-  set.add(node)
-  node.forEach(child => sort(child, set))
+const collect = (n, set, condition) => {
+  if (condition(n)) {
+    set.add(n)
+    n.forEach(n => collect(n, set, condition))
+  }
   return set
-}
-const notify = (nodes) => {
-  const topologicalNodes = new Set()
-  nodes.forEach(node => {
-    node.needUpdate = true
-    sort(node, topologicalNodes)
-  })
-  topologicalNodes.forEach(node => {
-    if (node.needUpdate) {
-      node.update()
-    }
-  })
 }
 
 const batchNodes = new Set()
+const potentialUpdates = new Set()
 export let batching = true
 const batchNotify = (node) => {
+  node.needUpdate = true
+  collect(node, potentialUpdates, n => {
+    const { potentialUpdate } = n
+    if (!potentialUpdate) n.potentialUpdate = true
+    return !potentialUpdate
+  })
+
   if (!batching) {
     // sync: trigger maximum call stack error if circular
-    notify([node])
+    node.checkUpdate()
     return
   }
   batchNodes.add(node)
@@ -99,10 +109,13 @@ const batchNotify = (node) => {
     return Promise.resolve().then(() => {
       batching = false
       try {
-        notify([...batchNodes])
+        batchNodes.forEach(n => n.checkUpdate())
       } finally {
         batchNodes.clear()
         batching = true
+        // clean
+        potentialUpdates.forEach(n => n.potentialUpdate = false)
+        potentialUpdates.clear()
       }
     })
   }

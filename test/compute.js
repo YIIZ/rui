@@ -118,6 +118,21 @@ test('batch', async t => {
   unwatch()
 })
 
+test('visit expired value while batching', async t => {
+  const [a, set] = value(0)
+  const b = compute(() => a())
+
+  const unwatch = watch(b)
+  t.is(b(), 0)
+  set(1)
+  t.is(b(), 1)
+  set(2)
+  await 0
+  t.is(b(), 2)
+  unwatch()
+})
+
+
 test('compute cache', async t => {
   t.plan(1)
   const [v, setV] = value(1)
@@ -176,11 +191,13 @@ test('simple executing order', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c'])
+  t.deepEqual(result, ['a', 'c', 'b'])
   unwatch()
 })
 
 test('complex executing order', async t => {
+  // a>b-->e
+  // |>c>d|
   let result = []
 
   const a = take(() => {
@@ -210,11 +227,13 @@ test('complex executing order', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'd', 'e'])
+  t.deepEqual(result, ['a', 'b', 'e', 'c', 'd'])
   unwatch()
 })
 
 test('complex executing order with skip', async t => {
+  // a>b--->e
+  // |>*c>d|
   let result = []
 
   const a = take(() => {
@@ -244,12 +263,14 @@ test('complex executing order with skip', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'e'])
+  t.deepEqual(result, ['a', 'b', 'e', 'c'])
 
   unwatch()
 })
 
 test('executing order with batch', async t => {
+  // a>-|
+  // b>c>d
   let result = []
 
   const a = take(() => {
@@ -278,7 +299,49 @@ test('executing order with batch', async t => {
   a.update()
   b.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'd'])
+  t.deepEqual(result, ['a', 'd', 'b', 'c'])
+
+  unwatch()
+})
+
+test('executing order with circular updating(unchanged)', async t => {
+  // a-->b
+  // |>c|<*d
+  let result = []
+
+  const a = take(() => {
+    result.push('a')
+    return a.v
+  }, (u) => {
+    a.update = u
+  })
+  const d = take(() => {
+    result.push('d')
+    return d.v
+  }, (u) => {
+    d.update = u
+  })
+  const b = compute(() => {
+    result.push('b')
+    // d.v = Date.now() // unchanged
+    d.update && d.update() // circular update
+    return a() + c()
+  })
+  const c = compute(() => {
+    result.push('c')
+    return a() + d()
+  })
+
+  a.v = 1
+  d.v = 1
+
+  const unwatch = watch(b)
+  result = []
+  a.v = 2
+  a.update()
+  await 0
+  t.deepEqual(result, ['a', 'b', 'd', 'c'])
+  t.is(b(), 5)
 
   unwatch()
 })
@@ -346,8 +409,7 @@ test('change depdendency while notify', async t => {
   set('stopwatchc')
   await 0
   t.is(callb.callCount, 2)
-  // TODO? t.is(callc.callCount, 1)
-  t.is(callc.callCount, 2)
+  t.is(callc.callCount, 1)
   t.is(calld.callCount, 2)
   unwatchd()
 })
