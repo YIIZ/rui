@@ -176,11 +176,13 @@ test('simple executing order', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c'])
+  t.deepEqual(result, ['a', 'c', 'b'])
   unwatch()
 })
 
 test('complex executing order', async t => {
+  // a>b-->e
+  // |>c>d|
   let result = []
 
   const a = take(() => {
@@ -210,11 +212,13 @@ test('complex executing order', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'd', 'e'])
+  t.deepEqual(result, ['a', 'b', 'e', 'c', 'd'])
   unwatch()
 })
 
 test('complex executing order with skip', async t => {
+  // a>b--->e
+  // |>*c>d|
   let result = []
 
   const a = take(() => {
@@ -244,12 +248,14 @@ test('complex executing order with skip', async t => {
   result = []
   a.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'e'])
+  t.deepEqual(result, ['a', 'b', 'e', 'c'])
 
   unwatch()
 })
 
 test('executing order with batch', async t => {
+  // a>-|
+  // b>c>d
   let result = []
 
   const a = take(() => {
@@ -278,7 +284,7 @@ test('executing order with batch', async t => {
   a.update()
   b.update()
   await 0
-  t.deepEqual(result, ['a', 'b', 'c', 'd'])
+  t.deepEqual(result, ['a', 'd', 'b', 'c'])
 
   unwatch()
 })
@@ -346,8 +352,7 @@ test('change depdendency while notify', async t => {
   set('stopwatchc')
   await 0
   t.is(callb.callCount, 2)
-  // TODO? t.is(callc.callCount, 1)
-  t.is(callc.callCount, 2)
+  t.is(callc.callCount, 1)
   t.is(calld.callCount, 2)
   unwatchd()
 })

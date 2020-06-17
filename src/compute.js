@@ -12,6 +12,7 @@ class Node extends Set {
     this.boundEval = boundEval
   }
   update() {
+    this.needUpdate = false
     const { dependencies: oldDeps } = this
 
     if (oldDeps) {
@@ -32,9 +33,17 @@ class Node extends Set {
 
     if (this.value !== newValue) {
       this.value = newValue
-      this.forEach(d => d.needUpdate = true)
+      this.forEach(d => d.needUpdate = d !== current)
+      this.forEach(d => d.needUpdate && d.update())
     }
-    this.needUpdate = false
+  }
+  checkUpdate() {
+    if (this.needUpdate) {
+      this.update()
+    } else if (this.dependencies) {
+      // TODO skip unchanged
+      this.dependencies.forEach(d => d.checkUpdate())
+    }
   }
   eval() {
     if (current && current.dependencies) {
@@ -43,7 +52,12 @@ class Node extends Set {
         this.add(current)
       }
     }
-    return this.size > 0 ? this.value : this.taker()
+    if (this.size > 0) {
+      this.checkUpdate()
+      return this.value
+    } else {
+      return this.taker()
+    }
   }
   add(node) {
     super.add(node)
@@ -55,7 +69,6 @@ class Node extends Set {
   delete(node) {
     super.delete(node)
     if (this.size === 0) {
-      this.needUpdate = false // fix unwatch while notify
       if (this.dependencies) {
         this.dependencies.forEach(d => d.delete(this))
       }
@@ -65,24 +78,12 @@ class Node extends Set {
 }
 
 
-const sort = (node, set) => {
-  // topological order
-  // move repeat to end
-  set.delete(node)
-  set.add(node)
-  node.forEach(child => sort(child, set))
-  return set
-}
 const notify = (nodes) => {
-  const topologicalNodes = new Set()
   nodes.forEach(node => {
     node.needUpdate = true
-    sort(node, topologicalNodes)
   })
-  topologicalNodes.forEach(node => {
-    if (node.needUpdate) {
-      node.update()
-    }
+  nodes.forEach(node => {
+    node.checkUpdate()
   })
 }
 
