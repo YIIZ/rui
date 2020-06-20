@@ -68,6 +68,17 @@ test('value basic', async t => {
   unwatch()
 })
 
+test('circular', async t => {
+  const a = compute(() => b())
+  const b = compute(() => a())
+  const unwatch = watch(() => {
+    // no call stack exceeding
+    t.is(b(), undefined)
+  })
+
+  unwatch()
+})
+
 test('compute change dep', async t => {
   const [depIndex, setDepIndex] = value(1)
 
