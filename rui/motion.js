@@ -1,4 +1,4 @@
-import { take, compute } from 'rui'
+import { take, compute, peek } from 'rui'
 import sync, { cancelSync } from 'framesync'
 
 // inspired by react-spring
@@ -8,14 +8,16 @@ import sync, { cancelSync } from 'framesync'
 // spring equation?
 // https://github.com/Popmotion/popmotion/blob/67de44d30e7e5fa3eb14f7cf60b97dd96fe34cd8/packages/popmotion/src/animations/spring.ts#L22-L63
 export const spring = (getTo, {
-  from=getTo(), velocity: initialVelocity=0,
+  from=peek(getTo), velocity: initialVelocity=0,
   mass=1, tension=170, friction=26, precision=0.01,
 }={}) => {
   let current = from
   let to
   let velocity = initialVelocity
 
-  const animate = take(() => current, update => {
+
+  let forceUpdate = false
+  const animate = take(() => forceUpdate = !forceUpdate, update => {
     const process = sync.update(({ delta: elapsed }) => {
       const force = tension * (to - current)
       const damping = friction * velocity
@@ -28,10 +30,23 @@ export const spring = (getTo, {
   })
   const complete = compute(() => {
     to = getTo()
-    return velocity < precision && Math.abs(to - current) < precision
+    const complete = velocity < precision && Math.abs(to - current) < precision
+    // NOTICE: velocity changed, current not changed
+    if (!complete) animate() // update current&velocity if not complete
+    return complete
   })
   const animating = compute(() => !complete())
-  const value = compute(() => complete() ? to : animate())
+  const value = compute(() => {
+    if (complete()) {
+      return to
+    }
+    else {
+      animate() // subscribe animation
+      return current
+    }
+  })
+
+  // TODO, expose { current, to, velocity }?
   return [value, animating]
 }
 
