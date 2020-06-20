@@ -32,6 +32,8 @@ export class Node extends Set {
 
     if (this.value !== newValue) {
       this.value = newValue
+      // skip update current visiting target
+      // TODO? reuse `notify(...this, skipMark=true)`
       this.forEach(d => d.needUpdate = d !== current)
       this.forEach(d => d.checkUpdate())
     }
@@ -79,43 +81,40 @@ export class Node extends Set {
   }
 }
 
-
-const collect = (n, set, condition) => {
-  if (condition(n)) {
-    set.add(n)
-    n.forEach(n => collect(n, set, condition))
-  }
-  return set
+const traverse = (node, fn) => {
+  if (fn(node)) node.forEach(n => traverse(n, fn))
 }
 
-const batchNodes = new Set()
-const potentialUpdates = new Set()
-export let batching = true
-const batchNotify = (node) => {
+const markPotential = node => {
   node.needUpdate = true
-  collect(node, potentialUpdates, n => {
-    const { potentialUpdate } = n
-    if (!potentialUpdate) n.potentialUpdate = true
-    return !potentialUpdate
+  const potentials = []
+  traverse(node, node => {
+    if (node.potentialUpdate) return false
+    node.potentialUpdate = true
+    potentials.push(node)
+    return true
   })
+  return () => potentials.forEach(n => n.potentialUpdate = false)
+}
 
+let batching = []
+const batchNotify = (node) => {
+  const unmark = markPotential(node)
   if (!batching) {
-    // sync: trigger maximum call stack error if circular
-    node.checkUpdate()
+    // sync notify
+    try { node.checkUpdate() } finally { unmark() }
     return
   }
-  batchNodes.add(node)
-  if (batchNodes.size === 1) {
+
+  batching.push([node, unmark])
+  if (batching.length === 1) {
     return Promise.resolve().then(() => {
-      batching = false
+      const items = batching
+      batching = null
       try {
-        batchNodes.forEach(n => n.checkUpdate())
+        items.forEach(([node, unmark]) => { try { node.checkUpdate() } finally { unmark() } })
       } finally {
-        batchNodes.clear()
-        batching = true
-        // clean
-        potentialUpdates.forEach(n => n.potentialUpdate = false)
-        potentialUpdates.clear()
+        batching = []
       }
     })
   }
