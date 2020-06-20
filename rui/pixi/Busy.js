@@ -5,7 +5,7 @@ import { Sprite } from './nodes'
 import Closable from './Closable'
 import Spinner from './Spinner'
 import Mask from './Mask'
-import { useSpringAni } from '.'
+import { spring } from '../motion'
 
 export default function Busy(props) {
   const [count, setCount] = value(0)
@@ -15,12 +15,10 @@ export default function Busy(props) {
   const dec = () => setCount(count() - 1)
 
 
-  const ani = useSpringAni()
-  // TODO DRY
-  const [alive, setAlive] = value(open())
-  watch(compute(() => open() || !!ani.playing()), alive => setAlive(alive))
+  const [alpha, animating] = spring(() => open() ? 1 : 0)
+  const alive = compute(() => open() || animating())
 
-  const node = <Closable open={alive} alpha={ani(() => open() ? 1 : 0)}>
+  const node = <Closable open={alive} alpha={alpha}>
     <Mask></Mask>
     <Spinner></Spinner>
   </Closable>
