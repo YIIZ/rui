@@ -54,3 +54,21 @@ export const spring = (getTo, {
 // TODO
 // tween
 // chain? keyframes? composite?
+export const useAction = (getAction) => {
+  const animate = compute(() => {
+    const action = getAction()
+    let v
+    return take(() => v, update => {
+      const play = action.start({
+        update: (_v) => {
+          v = _v
+          update()
+        },
+        // complete: () => ,
+      })
+      return () => play.stop()
+    })
+  })
+  return compute(() => animate()())
+}
+
