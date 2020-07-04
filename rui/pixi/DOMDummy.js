@@ -1,5 +1,5 @@
 // @jsx h
-import { h, value, compute, hook, useRoot } from 'rui'
+import { h, value, compute, hook, apply, useRoot } from 'rui'
 import { Element } from 'rui/src/html'
 
 function computeWorldTransform(transform, ratio) {
@@ -20,8 +20,8 @@ function computeWorldTransform(transform, ratio) {
   })
 }
 
-// TODO use ratio by useAppSize?
-export default function DOMDummy({ visible, style:_style='', ...props }, [node]) {
+// TODO better?
+export function domStyleFromNode(node, { visible, style:_style='' }) {
   const root = useRoot()
   // TODO no need to check root?
   const ratio = () => root()?.size().ratio
@@ -51,8 +51,10 @@ export default function DOMDummy({ visible, style:_style='', ...props }, [node])
       ${_style}
     `
   })
+  return style
+}
 
-  const domNode = <Element {...props} style={style}></Element>
+export function attachDOM(domNode) {
   hook(() => {
     domNode.attach()
     document.body.appendChild(domNode.el)
@@ -61,7 +63,11 @@ export default function DOMDummy({ visible, style:_style='', ...props }, [node])
       document.body.removeChild(domNode.el)
     }
   })
+}
 
+export default function DOMDummy({ visible, style, ...props }, [node]) {
+  const domNode = <Element {...props} style={domStyleFromNode(node, { visible, style })}></Element>
+  attachDOM(domNode, node)
   node.dom = domNode.el
   return node
 }
