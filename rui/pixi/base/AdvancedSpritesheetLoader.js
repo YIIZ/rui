@@ -1,7 +1,7 @@
 // supports easeljs like slim json format
 // - multiple images support
 // - pure array data
-// - load image by manual `${id}/${name}`
+// - load image by manual adding `${id}_${index}`
 import { Loader, SpritesheetLoader, LoaderResource, Rectangle, Texture } from 'pixi.js'
 
 // TODO batch?
@@ -15,8 +15,8 @@ async function use(resource, next) {
     return
   }
 
-  const baseTextures = await Promise.all(data.images.map(async name => {
-    const res = this.resources[`${resource.name}/${name}`]
+  const baseTextures = await Promise.all(data.images.map(async (name, index) => {
+    const res = this.resources[`${resource.name}_${index}`]
     // wait dep res complete
     // res.isComplete is not safe
     // https://github.com/englercj/resource-loader/blob/60539c696216b5a2a941ca7dc50d81b3af616807/src/Loader.js#L646
