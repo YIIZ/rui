@@ -6,8 +6,8 @@ import { Node } from './nodes'
 import Busy from './Busy'
 
 // TODO built-in size?
-function Application({ size, ...props }, children) {
-  const app = new PIXI.Application(props)
+function Application({ size, options, ...props }, children) {
+  const app = new PIXI.Application(options)
   const { stage, renderer, view } = app
 
   const wh = compute(() => {
@@ -23,7 +23,7 @@ function Application({ size, ...props }, children) {
   const y = compute(() => wh()[1] * 0.5)
   const rotation = compute(() => size().rotation)
 
-  const node = <Node el={stage} x={x} y={y} rotation={rotation}>{...children}</Node>
+  const node = <Node el={stage} x={x} y={y} rotation={rotation} {...props}>{...children}</Node>
   node.app = app
   node.view = view
   node.stage = stage
