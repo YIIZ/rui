@@ -42,8 +42,9 @@ function BusyApplication({ size, ...props }, children) {
 
   app.busy = async (cb) => {
     busy.inc()
-    await cb()
+    const out = await cb()
     busy.dec()
+    return out
   }
 
   return app
