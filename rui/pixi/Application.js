@@ -8,7 +8,7 @@ import Busy from './Busy'
 // TODO built-in size?
 function Application({ size, options, ...props }, children) {
   const app = new PIXI.Application(options)
-  const { stage, renderer, view } = app
+  const { stage, renderer, view, ticker } = app
 
   const wh = compute(() => {
     const { width, height, rotate, ratio } = size()
@@ -29,6 +29,7 @@ function Application({ size, options, ...props }, children) {
   node.stage = stage
   node.renderer = renderer
   node.size = size
+  node.ticker = ticker
   return node
 }
 
