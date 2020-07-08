@@ -1,17 +1,23 @@
 import { take, compute, peek } from 'rui'
 import sync, { cancelSync } from 'framesync'
 
-
-export const useElapsed = () => {
-  let elapsed = 0
-  return take(() => elapsed, update => {
-    elapsed = 0 // reset after re-watch
-    const proc = sync.update(({ delta }) => {
-      elapsed += delta
+export const useFrame = () => {
+  let delta = 0
+  let timestamp = 0
+  return take(() => ([delta, timestamp]), update => {
+    delta = 0 // reset after re-watch
+    const proc = sync.update(({ delta: d, timestamp: t }) => {
+      delta = d
+      timestamp = t
       update()
     }, true)
     return () => cancelSync.update(proc)
   })
+}
+export const useElapsed = () => {
+  const frame = useFrame()
+  let elapsed = 0
+  return compute(() => elapsed += frame()[0])
 }
 
 
@@ -26,39 +32,27 @@ export const spring = (getTo, {
   mass=1, tension=170, friction=26, precision=0.01,
 }={}) => {
   let current = from
-  let to
   let velocity = initialVelocity
 
-  // TODO useElapsed(), re-watch jump bug?
-  let forceUpdate = false
-  const animate = take(() => forceUpdate = !forceUpdate, update => {
-    const proc = sync.update(({ delta }) => {
-      const force = tension * (to - current)
-      const damping = friction * velocity
-      const acceleration = (force - damping) / mass
-      velocity += (acceleration * delta) / 1000
-      current += (velocity * delta) / 1000
-      update()
-    }, true)
-    return () => cancelSync.update(proc)
-  })
-  const complete = compute(() => {
-    to = getTo()
+  const frame = useFrame()
+  const calc = compute(() => {
+    const to = getTo()
     const complete = velocity < precision && Math.abs(to - current) < precision
-    // NOTICE: velocity changed, current not changed
-    if (!complete) animate() // update current&velocity if not complete
-    return complete
+    if (complete) return [to, false]
+
+    const [delta] = frame()
+
+    const force = tension * (to - current)
+    const damping = friction * velocity
+    const acceleration = (force - damping) / mass
+    velocity += (acceleration * delta) / 1000
+    current += (velocity * delta) / 1000
+
+    return [current, true]
   })
-  const animating = compute(() => !complete())
-  const value = compute(() => {
-    if (complete()) {
-      return to
-    }
-    else {
-      animate() // subscribe animation
-      return current
-    }
-  })
+
+  const value = compute(() => calc()[0])
+  const animating = compute(() => calc()[1])
 
   // TODO, expose { current, to, velocity }?
   return [value, animating]
