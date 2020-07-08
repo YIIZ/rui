@@ -1,6 +1,20 @@
 import { take, compute, peek } from 'rui'
 import sync, { cancelSync } from 'framesync'
 
+
+export const useElapsed = () => {
+  let elapsed = 0
+  return take(() => elapsed, update => {
+    elapsed = 0 // reset after re-watch
+    const proc = sync.update(({ delta }) => {
+      elapsed += delta
+      update()
+    }, true)
+    return () => cancelSync.update(proc)
+  })
+}
+
+
 // inspired by react-spring
 // https://github.com/react-spring/react-spring/blob/master/src/animated/FrameLoop.ts#L76-L83
 // TODO
@@ -15,18 +29,18 @@ export const spring = (getTo, {
   let to
   let velocity = initialVelocity
 
-
+  // TODO useElapsed(), re-watch jump bug?
   let forceUpdate = false
   const animate = take(() => forceUpdate = !forceUpdate, update => {
-    const process = sync.update(({ delta: elapsed }) => {
+    const proc = sync.update(({ delta }) => {
       const force = tension * (to - current)
       const damping = friction * velocity
       const acceleration = (force - damping) / mass
-      velocity += (acceleration * elapsed) / 1000
-      current += (velocity * elapsed) / 1000
+      velocity += (acceleration * delta) / 1000
+      current += (velocity * delta) / 1000
       update()
     }, true)
-    return () => cancelSync.update(process)
+    return () => cancelSync.update(proc)
   })
   const complete = compute(() => {
     to = getTo()
