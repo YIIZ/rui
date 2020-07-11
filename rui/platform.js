@@ -47,4 +47,5 @@ export const hash = take(() => location.hash.slice(1), update => {
   window.addEventListener('hashchange', update)
   return () => window.removeEventListener('hashchange', update)
 })
+export const setHash = h => location.hash = h
 
