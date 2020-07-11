@@ -19,6 +19,8 @@ export const useElapsed = () => {
   let elapsed = 0
   return compute(() => elapsed += frame()[0])
 }
+const sharedFrame = useFrame()
+export { sharedFrame as frame }
 
 
 // inspired by react-spring
