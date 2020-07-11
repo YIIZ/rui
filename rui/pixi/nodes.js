@@ -74,6 +74,7 @@ export function Text({
   const text = compute(() => children.map(c => typeof c === 'function' ? c() : c).join(''))
 
   // TODO no compute call?
+  // const defaultText = children.filter(c => typeof c === 'string').join('')
   const el = new PIXI.Text(text(), {
     fontFamily,
     fontSize,
