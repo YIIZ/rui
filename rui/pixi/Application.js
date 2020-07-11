@@ -6,7 +6,7 @@ import { Node } from './nodes'
 import Busy from './Busy'
 
 // TODO built-in size?
-function Application({ size, options, ...props }, children) {
+export function Application({ size, options, ...props }, children) {
   const app = new PIXI.Application(options)
   const { stage, renderer, view, ticker } = app
 
@@ -33,7 +33,7 @@ function Application({ size, options, ...props }, children) {
   return node
 }
 
-function BusyApplication({ size, ...props }, children) {
+export function BusyApplication({ size, ...props }, children) {
   const busy = <Busy></Busy>
   const app = <Application size={size} {...props}>
     {...children}
@@ -50,6 +50,7 @@ function BusyApplication({ size, ...props }, children) {
   return app
 }
 
+// TODO DEPRECATED? default attached is not a good practise?
 export default function AttachedApplication(props, children) {
   const node = <BusyApplication {...props}>{...children}</BusyApplication>
   node.attach()
