@@ -15,6 +15,8 @@ const make = (segments, onRoute, depth=0, dir='/') => {
   // TODO mutiple route by switch/case?
   const route = (match, N) => {
     const test = typeof match === 'function' ? match : n => n === match
+
+    // TODO no builder, remove lazy next()
     return _if(() => test(name()), () => <N router={next}/>)
   }
   const router = { name, dir, next, go, pathOf, route }
