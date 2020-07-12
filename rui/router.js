@@ -1,5 +1,5 @@
 // @jsx h
-import { h, take, compute, peek, if as _if } from 'rui'
+import { h, take, value, compute, peek, if as _if } from 'rui'
 import { sep, join, normalize } from 'path'
 
 const make = (segments, onRoute, depth=0, dir='/') => {
@@ -23,8 +23,10 @@ const make = (segments, onRoute, depth=0, dir='/') => {
   return router
 }
 
-export function useRouter(path, onRoute) {
-  // default? [path, onRoute] = value('/')
+export function useRouter(path_, onRoute_) {
+  const [path, onRoute] = typeof path_ === 'undefined'
+    ? value('/')
+    : [path_, onRoute_]
   const segments = compute(() => normalize(`/${path()}/`).split(sep).slice(1, -1))
   return make(segments, onRoute)
 }
