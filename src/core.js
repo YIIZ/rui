@@ -128,6 +128,8 @@ function _if(value, Node) {
   const bool = typeof value === 'function'
     ? compute(() => !!value()) // cache bool
     : () => value
+
+  // TODO no `h` here? eg: if using custom `h` builder
   return compute(() => bool() ? h(Node) : null)
 }
 export function unless(value, Node) {
