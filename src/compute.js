@@ -108,7 +108,7 @@ const batchNotify = (node) => {
 
   batching.push([node, unmark])
   if (batching.length === 1) {
-    return Promise.resolve().then(() => {
+    return queueMicrotask(() => {
       const items = batching
       batching = null
       try {
