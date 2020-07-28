@@ -57,10 +57,13 @@ export function domStyleFromNode(node, { visible, style:_style='' }) {
 export function attachDOM(domNode) {
   hook(() => {
     domNode.attach()
-    document.body.appendChild(domNode.el)
+
+    const dom = domNode.el
+    const domAttached = !!dom.parentNode
+    if (!domAttached) document.body.appendChild(domNode.el)
     return () => {
       domNode.detach()
-      document.body.removeChild(domNode.el)
+      if (!domAttached) document.body.removeChild(domNode.el)
     }
   })
 }
