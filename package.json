@@ -3,8 +3,20 @@
   "version": "0.0.0",
   "author": "Bin Xin <rhyzix@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "ava"
+  },
   "dependencies": {
     "image-size": "^0.6.2",
     "intrinsic-scale": "^3.0.3"
+  },
+  "devDependencies": {
+    "ava": "^3.11.0",
+    "sinon": "^9.0.2"
+  },
+  "ava": {
+    "require": [
+      "esm"
+    ]
   }
 }
