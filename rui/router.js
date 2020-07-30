@@ -1,37 +1,74 @@
 // @jsx h
 import { h, take, value, compute, peek, if as _if } from 'rui'
-import { sep, join, normalize } from 'path'
+import { join, normalize } from 'path'
+
+const val = v => typeof v === 'function' ? v() : v
 
 // TODO
 // history?
 // go(path, state)?
-const make = (segments, onRoute, depth=0, dir='/') => {
+const make = (segments, onRoute, Container, dir='/') => {
   // base, ext?
   // https://nodejs.org/api/path.html#path_path_parse_path
-  const name = compute(() => segments()[depth])
+  const name = compute(() => segments()[0])
   // const path = compute(() => join(dir, `${name()}`))
-  const next = () => make(segments, onRoute, depth+1, join(dir, `${name()}`))
 
   // TODO class
   const pathOf = (...paths) => join(dir, ...paths)
-  const go = (...paths) => onRoute(pathOf(...paths))
-  // TODO mutiple route by switch/case?
-  const route = (match, N) => {
-    const test = typeof match === 'function' ? match : n => n === match
 
-    // TODO no builder, remove lazy next()
-    return _if(() => test(name()), () => <N router={next}/>)
+  // TODO go Component/0
+  const go = (...paths) => onRoute(pathOf(...paths))
+
+  let currentIndex = 0
+  const matches = []
+  const noMatches = compute(() => matches.every(m => !m()))
+
+  // TODO redesign: elegant solution for `default/lock/alive`
+  // TODO remove Container?
+  const Route = ({ component: Component, alias, default: default_=false, lock, transit, ...props }) => {
+    const index = `${currentIndex}`
+    currentIndex += 1
+    const myKeys = alias ? [].concat(alias, index) : [index]
+    // first as main key
+    const mainKey = myKeys[0]
+
+    const matchNoDefault = compute(() => {
+      if (lock && lock()) return true
+      return myKeys.includes(name())
+    })
+    matches.push(matchNoDefault)
+    const match = compute(() => matchNoDefault() || (noMatches() && val(default_)))
+
+    // persist while transition
+    let restCache
+    const rest = compute(() => {
+      if (match()) restCache = segments().slice(1)
+      return restCache
+    })
+
+    const router = make(rest, onRoute, Container, join(dir, mainKey))
+
+    if (transit) {
+      const [animating, transitions] = transit(match)
+      return <Container {...transitions}>
+        {_if(() => match() || animating(), () => <Component router={router} {...props} />)}
+      </Container>
+    } else {
+      return <Container>
+        {_if(match, () => <Component router={router} {...props} />)}
+      </Container>
+    }
   }
-  const router = { name, dir, next, go, pathOf, route }
+
+  const router = { name, dir, go, pathOf, Route }
   return router
 }
 
-export function useRouter(path_, onRoute_) {
+export function useRouter(path_, onRoute_, Container) {
   const [path, onRoute] = typeof path_ === 'undefined'
     ? value('/')
     : [path_, onRoute_]
-  const segments = compute(() => normalize(`/${path()}/`).split(sep).slice(1, -1))
-  return make(segments, onRoute)
+  const segments = compute(() => normalize(`/${path()}/`).split('/').slice(1, -1))
+  return make(segments, onRoute, Container)
 }
-
 export default useRouter
