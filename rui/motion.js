@@ -37,7 +37,7 @@ export const spring = (getTo, {
   let velocity = initialVelocity
 
   const frame = useFrame()
-  const initCurrent = compute(() => current = from || peek(getTo))
+  const initCurrent = compute(() => current = typeof from === 'number' ? from : peek(getTo))
   const calc = compute(() => {
     const to = getTo()
     // after to prevent multiple call `getTo()`
