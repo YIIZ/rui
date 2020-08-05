@@ -68,7 +68,7 @@ let sharedRenderer
 let sharedRenderTexture
 export function capture(
   displayObject,
-  { format = 'image/jpeg', quality = 0.8/*, width=displayObject.width, height=displayObject.height*/ } = {}
+  { format = 'image/png', quality = 1 } = {}
 ) {
   const { x, y, width, height } = displayObject.getBounds()
   const container = new PIXI.Container()
