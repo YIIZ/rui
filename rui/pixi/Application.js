@@ -41,10 +41,12 @@ export function BusyApplication({ size, ...props }, children) {
   </Application>
 
   app.busy = async (cb) => {
-    busy.inc()
-    const out = await cb()
-    busy.dec()
-    return out
+    try {
+      busy.inc()
+      return await cb()
+    } finally {
+      busy.dec()
+    }
   }
 
   return app
