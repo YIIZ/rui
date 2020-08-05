@@ -1,5 +1,12 @@
 import { take, compute, peek } from 'rui'
 import sync, { cancelSync } from 'framesync'
+import { interpolate } from '@popmotion/popcorn'
+
+// convenience method
+export const interp = (source, input, output) => {
+  const p = interpolate(input, output)
+  return compute(() => p(source()))
+}
 
 export const useFrame = () => {
   let delta = 0
@@ -45,6 +52,7 @@ export const spring = (getTo, {
     const complete = velocity < precision && Math.abs(to - current) < precision
     if (complete) return [to, false]
 
+    // TODO fix to update will call frame directly(re-calc)
     const [delta] = frame()
 
     const force = tension * (to - current)
