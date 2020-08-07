@@ -30,10 +30,7 @@ function Form({ text, active, onSubmit, onDestroy }) {
     inputEl.value = ''
 
     const text = value.trim()
-    if (text) {
-      onSubmit(text)
-      // hide()
-    }
+    onSubmit(text)
   }
 
   const [ani, animating] = spring(() => active() ? 1 : 0, { from: 0 })
