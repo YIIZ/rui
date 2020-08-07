@@ -19,7 +19,7 @@ function buildDOM(Tag, { style, ...props }, ...children) {
 }
 
 
-function Form({ text, type, active, onSubmit, onDestroy }) {
+function Form({ text, active, onSubmit, onDestroy }) {
   const h = buildDOM
 
   let input
@@ -56,7 +56,7 @@ function Form({ text, type, active, onSubmit, onDestroy }) {
     y: compute(() => (1-ani())*50),
     opacity: ani,
   }}>
-    {input = <input type={type} value={text} style={{
+    {input = <input type="text" value={text} style={{
       flex: 1,
       boxSizing: 'border-box',
       color: '#fff',
@@ -81,11 +81,10 @@ function Form({ text, type, active, onSubmit, onDestroy }) {
 }
 
 let formCache
-export default (initText='', type='text') => {
+export default (initText) => {
   if (!formCache) {
     const [active, setActive] = value(false)
     const [text, setText] = value('')
-    const [type, setType] = value('text')
 
     let onSubmit
     const attach = () => {
@@ -100,7 +99,6 @@ export default (initText='', type='text') => {
     }
     const form = <Form active={active}
       text={text}
-      type={type}
       onDestroy={detach}
       onSubmit={t => {
         onSubmit(t)
@@ -108,9 +106,8 @@ export default (initText='', type='text') => {
       }}
     />
     formCache = {
-      open: (text, type, handler) => {
+      open: (text, handler) => {
         setText(text)
-        setType(type)
         onSubmit = handler
         setActive(true)
         attach()
@@ -121,5 +118,5 @@ export default (initText='', type='text') => {
     }
   }
 
-  return new Promise(resolve => formCache.open(initText, type, resolve))
+  return new Promise(resolve => formCache.open(initText, resolve))
 }
