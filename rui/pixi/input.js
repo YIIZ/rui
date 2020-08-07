@@ -81,7 +81,7 @@ function Form({ text, active, onSubmit, onDestroy }) {
 }
 
 let formCache
-export default (initText) => {
+export default (initText='') => {
   if (!formCache) {
     const [active, setActive] = value(false)
     const [text, setText] = value('')
