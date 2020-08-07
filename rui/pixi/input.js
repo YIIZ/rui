@@ -38,7 +38,7 @@ function Form({ text, active, onSubmit, onDestroy }) {
 
   const [ani, animating] = spring(() => active() ? 1 : 0, { from: 0 })
   apply(() => {
-    if (active() && !animating()) input.el.focus()
+    if (active()) input.el.focus()
     if (!active() && !animating()) onDestroy()
   })
 
@@ -53,8 +53,8 @@ function Form({ text, active, onSubmit, onDestroy }) {
     width: '100%',
     backgroundColor: '#1c1c1c',
     borderTop: '1px solid #282828',
-    y: compute(() => (1-ani())*50),
-    opacity: ani,
+    y: compute(() => `${(1-ani())*100}%`),
+    opacity: compute(() => Math.max(0.1, ani())), // fix focus when opacity < 0.1
   }}>
     {input = <input type="text" value={text} style={{
       flex: 1,
@@ -81,42 +81,42 @@ function Form({ text, active, onSubmit, onDestroy }) {
 }
 
 let formCache
-export default (initText='') => {
-  if (!formCache) {
-    const [active, setActive] = value(false)
-    const [text, setText] = value('')
+// TODO lazy creating, fix stylefire delayed display input(position/zIndex)
+if (!formCache) {
+  const [active, setActive] = value(false)
+  const [text, setText] = value('')
 
-    let onSubmit
-    const attach = () => {
-      if (!form.attached) { // input while transition hiding
-        document.body.appendChild(form.el)
-        form.attach()
-      }
-    }
-    const detach = () => {
-      document.body.removeChild(form.el)
-      form.detach()
-    }
-    const form = <Form active={active}
-      text={text}
-      onDestroy={detach}
-      onSubmit={t => {
-        onSubmit(t)
-        formCache.close()
-      }}
-    />
-    formCache = {
-      open: (text, handler) => {
-        setText(text)
-        onSubmit = handler
-        setActive(true)
-        attach()
-      },
-      close: () => {
-        setActive(false)
-      },
+  let onSubmit
+  const attach = () => {
+    if (!form.attached) { // input while transition hiding
+      document.body.appendChild(form.el)
+      form.attach()
     }
   }
-
+  const detach = () => {
+    document.body.removeChild(form.el)
+    form.detach()
+  }
+  const form = <Form active={active}
+    text={text}
+    onDestroy={detach}
+    onSubmit={t => {
+      onSubmit(t)
+      formCache.close()
+    }}
+  />
+  formCache = {
+    open: (text, handler) => {
+      setText(text)
+      onSubmit = handler
+      setActive(true)
+      attach()
+    },
+    close: () => {
+      setActive(false)
+    },
+  }
+}
+export default (initText='') => {
   return new Promise(resolve => formCache.open(initText, resolve))
 }
