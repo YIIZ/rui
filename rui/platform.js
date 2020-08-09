@@ -49,3 +49,8 @@ export const hash = take(() => location.hash.slice(1), update => {
 })
 export const setHash = h => location.hash = h
 
+
+export const pageVisible = take(() => !document.hidden, update => {
+  document.addEventListener('visibilitychange', update)
+  return () => document.removeEventListener('visibilitychange', update)
+})
