@@ -112,8 +112,9 @@ const batchNotify = (node) => {
       const items = batching
       batching = null
       try {
-        items.forEach(([node, unmark]) => { try { node.checkUpdate() } finally { unmark() } })
+        items.forEach(([node]) => node.checkUpdate())
       } finally {
+        items.forEach(([, unmark]) => unmark())
         batching = []
       }
     })

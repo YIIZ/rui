@@ -424,3 +424,23 @@ test('change depdendency while notify', async t => {
   t.is(calld.callCount, 2)
   unwatchd()
 })
+
+test('mix changed and unchanged notify', async t => {
+  // a>|
+  // b>c
+  const callc = fake()
+
+  const [a, seta] = value('a')
+  const [b, setb] = value('b')
+  const unwatchc = watch(() => {
+    a() // dep a
+    callc(b())
+  })
+
+  seta('a') // notify unchanged
+  setb('bb')
+  await 0
+  t.is(callc.callCount, 2)
+  t.is(callc.lastCall.firstArg, 'bb')
+  unwatchc()
+})
