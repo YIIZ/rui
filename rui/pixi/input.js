@@ -40,6 +40,7 @@ function Form({ text, active, onSubmit, onDestroy }) {
   })
 
   // TODO html mask?
+  // TODO theme dark/light
   return <form action="" onsubmit={submit} style={{
     display: 'flex',
     zIndex: 100,
@@ -48,30 +49,30 @@ function Form({ text, active, onSubmit, onDestroy }) {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    backgroundColor: '#1c1c1c',
-    borderTop: '1px solid #282828',
+    backgroundColor: '#f6f6f6', // '#1c1c1c',
+    borderTop: '1px solid #dbdbdb', // #282828
     y: compute(() => `${(1-ani())*100}%`),
     opacity: compute(() => Math.max(0.1, ani())), // fix focus when opacity < 0.1
   }}>
     {input = <input type="text" value={text} style={{
       flex: 1,
       boxSizing: 'border-box',
-      color: '#fff',
+      color: '#0d0d0d', // '#fff',
       borderRadius: 4,
       outline: 0,
       padding: '6px 12px',
       border: 0,
-      backgroundColor: '#282828',
+      backgroundColor: '#fff', //'#282828',
       fontSize: 16,
     }}/>}
     <button type="submit" style={{
       marginLeft: 8,
-      color: '#fff',
+      color: '#0d0d0d', //'#fff',
       borderRadius: 4,
       outline: 0,
       padding: '6px 12px',
       border: 0,
-      backgroundColor: '#333',
+      backgroundColor: '#eee', //'#333',
       fontSize: 16,
     }}>确定</button>
   </form>
