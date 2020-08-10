@@ -3,7 +3,12 @@ import { take, compute } from 'rui'
 export const useWindowSize = () => take(() => {
   const { clientWidth, clientHeight } = document.documentElement
   return [clientWidth, clientHeight]
-}, update => {
+}, u => {
+  const update = () => {
+    // skip resize while input
+    if (document.activeElement && document.activeElement.nodeName === 'INPUT') return
+    u()
+  }
   window.addEventListener('resize', update)
   return () => window.removeEventListener('resize', update)
 })
