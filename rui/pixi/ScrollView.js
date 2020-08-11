@@ -5,23 +5,19 @@ import Crop from 'lib/rui/pixi/Crop'
 import { oncePointerDrag } from 'lib/rui/pixi/utils'
 import * as PIXI from 'pixi.js'
 
-import { clamp } from '@popmotion/popcorn'
-
 export default function ScrollView({ height=400 }, children) {
-  const [y, setY] = value(0)
-
-  const content = <Container y={compute(() => -y())}>{...children}</Container>
+  const content = <Container y={compute(() => oy-y())}>{...children}</Container>
   const {
     width: contentWidth,
     height: contentHeight,
     y: offsetY,
   } = content.el.getBounds()
+  const oy = -offsetY-height*0.5
 
-  const minY = offsetY+height*0.5
-  const maxY = contentHeight+offsetY-height*0.5
-  setY(minY)
+  const [y, setY] = value(0)
+  const maxY = Math.max(0, contentHeight-height)
+  const setClampedY = (v) => setY(Math.clamp(v, 0, maxY))
 
-  const clampY = (v) => clamp(minY, maxY, v)
   // TODO velocity
   // https://github.com/YIIZ/wegame-xiongan/blob/master/src/usePointer.js#L69
   const down = ({ currentTarget: target, data }) => {
@@ -30,7 +26,7 @@ export default function ScrollView({ height=400 }, children) {
 
     oncePointerDrag(target, ({ data }) => {
       const { y: my } = data.getLocalPosition(target)
-      setY(clampY(ry-my))
+      setClampedY(ry-my)
     }, () => {})
   }
 
@@ -47,10 +43,10 @@ export default function ScrollView({ height=400 }, children) {
 
 export function VerticalScrollViewBar({ v, size, max, ...props }) {
   const scale = size/max
-  const y = compute(() => v()*scale)
+  const center = (max-size)/2
+  const y = compute(() => (v()-center)*scale)
 
   // TODO rounded graphic? antialias
-  // TODO not anchor 0.5 content
   return <Sprite y={y} tex={PIXI.Texture.WHITE} height={size*scale}
     width={8}
     tint={0x000000}
