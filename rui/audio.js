@@ -27,13 +27,14 @@ export class Audio extends Howl {
       // TODO clean?
       const unwatch = computeWatch(() => {
         if (!pageVisible() && super.playing()) {
-          unwatch()
+          // TODO fix, hide first, unwatch unavailable
           this.pause()
+          unwatch()
 
           const unwatch2 = computeWatch(() => {
             if (pageVisible()) {
-              unwatch2()
               this.play()
+              unwatch2()
             }
           })
         }
