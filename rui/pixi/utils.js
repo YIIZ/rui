@@ -36,9 +36,9 @@ async function doload(list, onProgress) {
 
   await new Promise((resolve) => {
     const onProgress2 = () => onProgress(loader.progress/100)
-    loader.on('progress', onProgress2)
-    loader.once('complete', () => {
-      loader.off('progress', onProgress2)
+    const binding = loader.onProgress.add(onProgress2)
+    loader.onComplete.once(() => {
+      binding.detach()
       resolve()
     })
     loader.load()
