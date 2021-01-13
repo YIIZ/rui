@@ -1,33 +1,66 @@
 import { take, compute, peek } from 'rui'
-import sync, { cancelSync } from 'framesync'
-import { interpolate } from '@popmotion/popcorn'
+// import { interpolate } from 'popmotion'
+import { pageVisible } from './platform'
 
-// convenience method
-export const interp = (source, input, output) => {
-  const p = interpolate(input, output)
-  return compute(() => p(source()))
-}
+// // convenience method
+// export const interp = (source, input, output) => {
+//   const p = interpolate(input, output)
+//   return compute(() => p(source()))
+// }
 
-export const useFrame = () => {
-  let delta = 0
-  let timestamp = 0
-  return take(() => ([delta, timestamp]), update => {
-    delta = 0 // reset after re-watch
-    const proc = sync.update(({ delta: d, timestamp: t }) => {
-      delta = d
-      timestamp = t
-      update()
-    }, true)
-    return () => cancelSync.update(proc)
+const getTimestamp = () => performance.now()
+export const timestamp = take(getTimestamp, update => {
+  let f
+  const loop = () => {
+    update()
+    f = requestAnimationFrame(loop)
+  }
+  f = requestAnimationFrame(loop)
+  return () => cancelAnimationFrame(f)
+})
+
+export const useVisibleTime = () => {
+  let invisibleTime = 0
+  let invisibleStart = 0
+  const setInvisibleStart = compute(() => {
+    if (!pageVisible()) invisibleStart = peek(timestamp)
+  })
+  return compute(() => {
+    setInvisibleStart()
+    const t = timestamp()
+    if (invisibleStart > 0) {
+      invisibleTime += t - invisibleStart
+      invisibleStart = 0
+    }
+    return t - invisibleTime
   })
 }
+
 export const useElapsed = () => {
-  const frame = useFrame()
-  let elapsed = 0
-  return compute(() => elapsed += frame()[0])
+  let startTime
+  const initStartTime = compute(() => {
+    startTime = peek(timestamp)
+  })
+  return compute(() => {
+    const t = timestamp()
+    initStartTime()
+    return t - startTime
+  })
 }
-const sharedFrame = useFrame()
-export { sharedFrame as frame }
+export const useDelta = () => {
+  let lastTime = 0
+  const initLastTime = compute(() => {
+    lastTime = peek(timestamp)
+  })
+  const getDelta = compute(() => {
+    const currentTime = timestamp()
+    initLastTime()
+    const delta = currentTime - lastTime
+    lastTime = currentTime
+    return [delta] // force update
+  })
+  return () => getDelta()[0]
+}
 
 
 // inspired by react-spring
@@ -43,7 +76,7 @@ export const spring = (getTo, {
   let current
   let velocity = initialVelocity
 
-  const frame = useFrame()
+  const getDelta = useDelta()
   const initCurrent = compute(() => current = typeof from === 'number' ? from : peek(getTo))
   const calc = compute(() => {
     const to = getTo()
@@ -53,7 +86,7 @@ export const spring = (getTo, {
     if (complete) return [to, false]
 
     // TODO fix to update will call frame directly(re-calc)
-    const [delta] = frame()
+    const delta = Math.min(getDelta(), 40) // max 40ms
 
     const force = tension * (to - current)
     const damping = friction * velocity
@@ -72,7 +105,7 @@ export const spring = (getTo, {
 }
 
 
-// TODO
+// TODO remove
 // tween
 // chain? keyframes? composite?
 export const useAction = (getAction) => {
