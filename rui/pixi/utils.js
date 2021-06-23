@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { value, compute } from 'rui'
-import { tween } from 'popmotion'
+
 
 export const onPointerEnd = (target, handler) => {
   target.on('pointerup', handler)
@@ -48,17 +48,17 @@ async function doload(list, onProgress) {
 export function load(items, { minDuration=0 } = {}) {
   const [ready, setReady] = value(false)
   const [loadProgress, setLoadProgress] = value(0)
-  const [fakeProgress, setFakeProgress] = value(0)
-  const progress = compute(() => loadProgress() * fakeProgress())
+  const realLoad = doload(items, setLoadProgress).then(() => setReady(true))
 
-  const realLoad = doload(items, setLoadProgress)
-  const fakeLoad = minDuration > 0
-    ? new Promise(complete => tween({ duration: minDuration }).start({ update: setFakeProgress, complete }))
-    : setFakeProgress(1)
-
-  Promise.all([fakeLoad, realLoad]).then(() => setReady(true))
-  realLoad.ready = ready
-  realLoad.progress = progress
+  if (minDuration > 0) {
+    const elapsed = useElapsed()
+    const fakeProgress = compute(() => Math.min(1, elapsed()/minDuration))
+    realLoad.ready = compute(() => ready() && fakeProgress() >= 1)
+    realLoad.progress = compute(() => loadProgress() * fakeProgress())
+  } else {
+    realLoad.ready = ready
+    realLoad.progress = loadProgress
+  }
   return realLoad
 }
 

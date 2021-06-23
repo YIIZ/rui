@@ -1,33 +1,37 @@
 // @jsx h
-import { h, value, compute, hook, if as _if, each } from 'rui'
+import { h, value, compute, hook, if as _if, each, computeWatch } from 'rui'
 import { Sprite, Container } from './nodes'
-
-import { everyFrame } from 'popmotion'
+import { timestamp } from '../motion'
 
 import DOMDummy from './DOMDummy'
 
 export default function Video({ src, onEnd, width, height, ...props }) {
-  const [time, setTime] = value(0)
   const [playing, setPlaying] = value(false)
+  // precision time
+  const time = compute(() => {
+    if (playing()) {
+      timestamp()
+    }
+    return dom.currentTime
+  })
   const [duration, setDuration] = value(Infinity)
   const remain = compute(() => duration() - time())
 
-
   const onplaying = () => {
-    const check = everyFrame().start(() => {
-      if (dom.paused) {
-        check.stop()
-        return
-      }
-      if (dom.currentTime >= 0.1) {
-        check.stop()
-        setPlaying(true)
-      }
-    })
+    setPlaying(true)
   }
   const onpause = () => {
     setPlaying(false)
   }
+  const truePlaying = compute(() => {
+    if (playing() && dom.currentTime >= 0.1) {
+      return true
+    } else {
+      timestamp()
+      return false
+    }
+  })
+
 
   // Container has no size
   const node = <Container {...props}><Sprite width={width} height={height}></Sprite></Container>
@@ -41,7 +45,6 @@ export default function Video({ src, onEnd, width, height, ...props }) {
     webkit-playsinline
     onended={onEnd}
     ondurationchange={() => setDuration(dom.duration)}
-    ontimeupdate={() => setTime(dom.currentTime)}
     onplaying={onplaying}
     onpause={onpause}
   >
@@ -49,7 +52,7 @@ export default function Video({ src, onEnd, width, height, ...props }) {
   </DOMDummy>
   const { dom } = dummy
 
-  dummy.playing = playing
+  dummy.playing = truePlaying
   dummy.time = time
   dummy.duration = duration
   dummy.remain = remain
@@ -58,9 +61,9 @@ export default function Video({ src, onEnd, width, height, ...props }) {
     await new Promise((resolve) => {
       // TODO bug, play and pause
       // merge onplaying
-      const check = everyFrame().start(() => {
-        if (dom.currentTime >= 0.1) {
-          check.stop()
+      const unwatch = computeWatch(() => {
+        if (truePlaying()) {
+          unwatch()
           resolve()
         }
       })
@@ -71,7 +74,6 @@ export default function Video({ src, onEnd, width, height, ...props }) {
   }
   // TODO no reset?
   dummy.reset = () => {
-    setTime(0)
     setDuration(Infinity)
   }
 

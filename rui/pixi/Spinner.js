@@ -4,12 +4,11 @@ import { h, hook, apply } from 'rui'
 import { Node } from '.'
 import { useElapsed } from '../motion'
 
-import { tween } from 'popmotion'
-import * as easing from '@popmotion/easing'
+import { createExpoIn, mirrorEasing } from 'popmotion'
 
 export default function Spinner({ width=6, radius=30, color=0xffffff, alpha=0.8, ...props }) {
   const arc = new PIXI.Graphics()
-  const ease = easing.mirrored(easing.createExpoIn(3))
+  const ease = mirrorEasing(createExpoIn(3))
 
   const elapsed = useElapsed()
   apply(() => {
