@@ -32,9 +32,10 @@ export const slice = (path, name) => {
   return [match, rest]
 }
 
-export const route = (path) => {
+export const route = (path, setPath, prefix='') => {
   const { current, sepExists, sepIndex, normalized } = parse(path)
 
+  const go = (p) => setPath(normalize(`${prefix}/${p}`))
   const sub = (name) => {
     const match = compute(() => current() === name)
     let restCache
@@ -42,7 +43,7 @@ export const route = (path) => {
       if (match()) restCache = sepExists() ? normalized().slice(sepIndex()) : ''
       return restCache
     })
-    return route(rest)
+    return route(rest, setPath, `${prefix}/${name}`)
   }
-  return [current, sub]
+  return [current, go, sub]
 }
