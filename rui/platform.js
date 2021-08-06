@@ -36,7 +36,8 @@ export const useAppSize = (designWidth=750, designHeight=1500) => {
     const parentHeight = designHeight
 
     // contain
-    const ratio = Math.min(parentWidth/width, parentHeight/height)
+    // const ratio = Math.min(parentWidth/width, parentHeight/height)
+    const ratio = parentWidth/width
     return {
       height: Math.ceil(ratio * height),
       width: Math.ceil(ratio * width),

@@ -36,7 +36,8 @@ export const route = (path, setPath, prefix='') => {
   const { current, sepExists, sepIndex, normalized } = parse(path)
 
   const go = (p) => setPath(normalize(`${prefix}/${p}`))
-  const sub = (name) => {
+  const sub = () => {
+    const name = current()
     const match = compute(() => current() === name)
     let restCache
     const rest = compute(() => {

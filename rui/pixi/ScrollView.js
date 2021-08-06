@@ -5,7 +5,7 @@ import Crop from 'lib/rui/pixi/Crop'
 import { oncePointerDrag } from 'lib/rui/pixi/utils'
 import * as PIXI from 'pixi.js'
 
-export default function ScrollView({ height=400 }, children) {
+export default function ScrollView({ height=400, ...props }, children) {
   const content = <Container y={compute(() => oy-y())}>{...children}</Container>
   const {
     width: contentWidth,
@@ -30,13 +30,13 @@ export default function ScrollView({ height=400 }, children) {
     }, () => {})
   }
 
-  return <Container>
+  return <Container {...props}>
     <Crop width={contentWidth} height={height}
       onpointerdown={down}
     >
       {content}
     </Crop>
-    <VerticalScrollViewBar x={contentWidth*0.5+10} v={y} size={height} max={contentHeight}/>
+    <VerticalScrollViewBar x={contentWidth*0.5-4} v={y} size={height} max={contentHeight}/>
   </Container>
 }
 

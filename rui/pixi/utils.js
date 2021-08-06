@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { value, compute } from 'rui'
+import { useElapsed } from '../motion'
 
 
 export const onPointerEnd = (target, handler) => {
@@ -78,10 +79,10 @@ export function capture(
 
   // cache
   const renderer = sharedRenderer = sharedRenderer || PIXI.autoDetectRenderer()
-  const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create(0, 0)
+  const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create()
   rt.resize(width, height)
-  renderer.render(container, rt)
-  const dataURL = renderer.extract.canvas(rt).toDataURL(format, quality)
+  renderer.render(container, { renderTexture: rt })
+  const dataURL = renderer.plugins.extract.canvas(rt).toDataURL(format, quality)
   return dataURL
 }
 

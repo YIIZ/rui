@@ -63,8 +63,8 @@ export default function Video({ src, onEnd, width, height, ...props }) {
       // merge onplaying
       const unwatch = computeWatch(() => {
         if (truePlaying()) {
-          unwatch()
           resolve()
+          Promise.resolve().then(unwatch)
         }
       })
     })
