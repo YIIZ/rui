@@ -79,7 +79,7 @@ export function capture(
 
   // cache
   const renderer = sharedRenderer = sharedRenderer || PIXI.autoDetectRenderer()
-  const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create()
+  const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create({ width: 100, height: 100 })
   rt.resize(width, height)
   renderer.render(container, { renderTexture: rt })
   const dataURL = renderer.plugins.extract.canvas(rt).toDataURL(format, quality)
@@ -92,6 +92,7 @@ export function resetEventTarget(app, getRatio) {
   // set event target to support event behind capture img
   const { renderer } = app
   const { interaction } = renderer.plugins
+  // TODO like #app container? prevent dom overlay like login events?
   const target = document.body
   interaction.setTargetElement(target, renderer.resolution)
   // window.interaction = interaction
