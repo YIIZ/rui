@@ -3,7 +3,7 @@ import { Loader, LoaderResource, Rectangle, Texture } from 'pixi.js'
 
 async function pre(resource, next) {
   const { extension, name, url } = resource
-  if (extension !== 'ttf') {
+  if (!/ttf|woff/.test(extension)) {
     next()
     return
   }
