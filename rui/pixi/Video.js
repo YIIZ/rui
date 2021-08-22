@@ -5,7 +5,7 @@ import { timestamp } from '../motion'
 
 import DOMDummy from './DOMDummy'
 
-export default function Video({ src, onEnd, width, height, ...props }) {
+export default function Video({ src, onEnd, width, height, domProps={}, ...props }) {
   const [playing, setPlaying] = value(false)
   // precision time
   const time = compute(() => {
@@ -47,6 +47,7 @@ export default function Video({ src, onEnd, width, height, ...props }) {
     ondurationchange={() => setDuration(dom.duration)}
     onplaying={onplaying}
     onpause={onpause}
+    {...domProps}
   >
     {node}
   </DOMDummy>
