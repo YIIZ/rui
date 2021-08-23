@@ -74,13 +74,22 @@ export function capture(
   const { x, y, width, height } = displayObject.getBounds()
   const container = new PIXI.Container()
   container.addChild(displayObject)
-  container.x = -x
-  container.y = -y
+
+  // max texture size
+  // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#understand_system_limits
+  const MAX_SIZE = 4096
+  const scale = Math.min(1, MAX_SIZE/width, MAX_SIZE/height)
+  const w = Math.round(scale*width)
+  const h = Math.round(scale*height)
+  container.width = Math.round(scale*width)
+  container.height = Math.round(scale*height)
+  container.x = -Math.round(scale*x)
+  container.y = -Math.round(scale*y)
 
   // cache
   const renderer = sharedRenderer = sharedRenderer || PIXI.autoDetectRenderer()
   const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create({ width: 100, height: 100 })
-  rt.resize(width, height)
+  rt.resize(container.width, container.height)
   renderer.render(container, { renderTexture: rt })
   const dataURL = renderer.plugins.extract.canvas(rt).toDataURL(format, quality)
   return dataURL
