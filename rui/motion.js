@@ -70,22 +70,18 @@ export const useDelta = () => {
 // spring equation?
 // https://github.com/Popmotion/popmotion/blob/67de44d30e7e5fa3eb14f7cf60b97dd96fe34cd8/packages/popmotion/src/animations/spring.ts#L22-L63
 export const spring = (getTo, {
-  from, velocity: initialVelocity=0,
+  from=getTo(), velocity: initialVelocity=0,
   mass=1, tension=170, friction=26, precision=0.01,
 }={}) => {
-  let current
+  let current = from
   let velocity = initialVelocity
 
   const getDelta = useDelta()
-  const initCurrent = compute(() => current = typeof from === 'number' ? from : peek(getTo))
   const calc = compute(() => {
     const to = getTo()
-    // after to prevent multiple call `getTo()`
-    initCurrent()
     const complete = velocity < precision && Math.abs(to - current) < precision
     if (complete) return [to, false]
 
-    // TODO fix to update will call frame directly(re-calc)
     const delta = Math.min(getDelta(), 40) // max 40ms
 
     const force = tension * (to - current)
@@ -99,8 +95,6 @@ export const spring = (getTo, {
 
   const value = compute(() => calc()[0])
   const animating = compute(() => calc()[1])
-
-  // TODO, expose { current, to, velocity }?
   return [value, animating]
 }
 
