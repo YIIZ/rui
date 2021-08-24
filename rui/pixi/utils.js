@@ -67,7 +67,7 @@ export function load(items, { minDuration=0 } = {}) {
 
 let sharedRenderer
 let sharedRenderTexture
-export function capture(
+export async function capture(
   displayObject,
   { format = 'image/png', quality = 1 } = {}
 ) {
@@ -91,8 +91,20 @@ export function capture(
   const rt = sharedRenderTexture = sharedRenderTexture || PIXI.RenderTexture.create({ width: 100, height: 100 })
   rt.resize(container.width, container.height)
   renderer.render(container, { renderTexture: rt })
-  const dataURL = renderer.plugins.extract.canvas(rt).toDataURL(format, quality)
-  return dataURL
+
+  const canvas = renderer.plugins.extract.canvas(rt)
+
+  // blob url is better than base64(android laggy on large base64)
+  // upng fallback? blob support?
+  if (typeof canvas.toBlob === 'function') {
+    return await new Promise(resolve => {
+      canvas.toBlob((blob) => {
+        resolve(URL.createObjectURL(blob))
+      }, format, quality)
+    })
+  }
+
+  return canvas.toDataURL(format, quality)
 }
 
 
