@@ -473,3 +473,41 @@ test('mix changed and unchanged notify', async t => {
   t.is(callc.lastCall.firstArg, 'bb')
   unwatchc()
 })
+
+test('change the only dependent', async t => {
+  // before:
+  // a > b > d
+  // c >-|
+  // after:
+  // a > b > d
+  // c >-----|
+  const [a, seta] = value('call-c')
+
+  const subscriber = fake()
+  const unsubscriber = fake()
+  const c = take(
+    () => 1,
+    () => {
+      subscriber()
+      return unsubscriber
+    }
+  )
+
+  const b = compute(() => (a() === 'call-c' ? c() : 10))
+
+  const unwatch = watch(() => {
+    if (b() === 10) {
+      c()
+    }
+  })
+  t.is(subscriber.callCount, 1)
+  t.is(unsubscriber.callCount, 0)
+
+  seta('no')
+  await 0
+  t.is(subscriber.callCount, 1)
+  t.is(unsubscriber.callCount, 0)
+  unwatch()
+  t.is(subscriber.callCount, 1)
+  t.is(unsubscriber.callCount, 1)
+})
