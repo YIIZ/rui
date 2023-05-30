@@ -1,5 +1,5 @@
 // @jsx h
-import { h, take, value, compute, peek, if as _if } from 'rui'
+import { h, take, value, compute, peek, if as _if } from '@rui/core'
 import { join, normalize as normalize_ } from 'path-browserify'
 
 export const normalize = p => normalize_(`/${p}`).slice(1) // remove leading `/`

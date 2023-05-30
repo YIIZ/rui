@@ -1,5 +1,5 @@
 // @jsx h
-import { h, take, value, compute, hook, if as _if, unless, apply, peek, useRoot } from 'rui'
+import { h, take, value, compute, hook, if as _if, unless, apply, peek, useRoot } from '@rui/core'
 import { Container, Sprite, Node } from 'lib/rui/pixi'
 import Crop from 'lib/rui/pixi/Crop'
 import { oncePointerDrag } from 'lib/rui/pixi/utils'

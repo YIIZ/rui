@@ -1,4 +1,4 @@
-import { Node } from './core'
+import { Node } from '@rui/core'
 
 function createTextNode(data='') {
   return new Node(document.createTextNode(data), { data })

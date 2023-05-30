@@ -1,5 +1,5 @@
 // @jsx h
-import { h, compute, useRoot } from 'rui'
+import { h, compute, useRoot } from '@rui/core'
 import * as PIXI from 'pixi.js'
 import { Node, Container, Sprite } from './nodes'
 

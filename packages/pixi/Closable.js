@@ -1,6 +1,6 @@
 // @jsx h
 import * as PIXI from 'pixi.js'
-import { h, value, compute, replace } from 'rui'
+import { h, value, compute, replace } from '@rui/core'
 import { Container } from './nodes'
 
 export default function Closable({ open, ...props }, children) {

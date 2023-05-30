@@ -1,4 +1,4 @@
-import { compute, useRoot, isCompute } from 'rui'
+import { compute, useRoot, isCompute } from '@rui/core'
 
 export function usePosition({ left, right, top, bottom }, useAnchor=true) {
   const root = useRoot()

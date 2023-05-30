@@ -1,6 +1,6 @@
 // @jsx h
-import { h, value, compute, hook, apply, useRoot } from 'rui'
-import { Element } from 'rui/src/html'
+import { h, value, compute, hook, apply, useRoot } from '@rui/core'
+import { Element } from '@rui/html'
 
 function computeWorldTransform(transform, ratio) {
   const [worldId, setWorldId] = value(transform._worldID)

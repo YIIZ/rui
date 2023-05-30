@@ -1,5 +1,5 @@
 // @jsx h
-import { h, value, compute, hook, if as _if, each } from 'rui'
+import { h, value, compute, hook, if as _if, each } from '@rui/core'
 import { Container, Sprite, Text } from './nodes'
 
 import { oncePointerEnd } from './utils'

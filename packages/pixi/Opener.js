@@ -1,6 +1,6 @@
 // @jsx h
 import * as PIXI from 'pixi.js'
-import { h, value, compute, if as _if } from 'rui'
+import { h, value, compute, if as _if } from '@rui/core'
 import { Container } from './nodes'
 
 // TODO

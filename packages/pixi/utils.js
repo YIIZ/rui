@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
-import { value, compute } from 'rui'
-import { useElapsed } from '../motion'
+import { value, compute } from '@rui/core'
+import { useElapsed } from '@rui/browser/motion'
 
 
 export const onPointerEnd = (target, handler) => {

@@ -1,4 +1,4 @@
-import { take, compute } from 'rui'
+import { take, compute } from '@rui/core'
 
 export const useWindowSize = () => take(() => {
   const { clientWidth, clientHeight } = document.documentElement

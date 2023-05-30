@@ -1,8 +1,8 @@
 // @jsx h
 import * as PIXI from 'pixi.js'
-import { h, hook, apply } from 'rui'
+import { h, hook, apply } from '@rui/core'
 import { Node } from '.'
-import { useElapsed } from '../motion'
+import { useElapsed } from '@rui/browser/motion'
 
 import { createExpoIn, mirrorEasing } from 'popmotion'
 

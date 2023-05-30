@@ -1,4 +1,4 @@
-import { compute, useRoot, isCompute } from 'rui'
+import { compute, useRoot, isCompute } from '@rui/core'
 
 export function useClick(listener) {
   return ({ currentTarget, data }) => {

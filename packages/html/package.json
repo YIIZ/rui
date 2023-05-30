@@ -1,0 +1,6 @@
+{
+  "name": "@rui/html",
+  "dependencies": {
+    "@rui/core": "workspace:*"
+  }
+}

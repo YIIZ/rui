@@ -8,7 +8,7 @@ module.exports = () => {
     code:
 `
 import * as PIXI from 'pixi.js'
-${content}
+${content.replace('PIXI.spine = pixi_spine;', '')}
 
 var Spine = pixi_spine.Spine
 export { Spine }

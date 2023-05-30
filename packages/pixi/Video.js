@@ -1,7 +1,7 @@
 // @jsx h
-import { h, value, compute, hook, if as _if, each, computeWatch } from 'rui'
+import { h, value, compute, hook, if as _if, each, computeWatch } from '@rui/core'
 import { Sprite, Container } from './nodes'
-import { timestamp } from '../motion'
+import { timestamp } from '@rui/browser/motion'
 
 import DOMDummy from './DOMDummy'
 

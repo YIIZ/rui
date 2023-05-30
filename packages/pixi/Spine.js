@@ -1,5 +1,5 @@
 // @jsx h
-import { h, value, compute, hook } from 'rui'
+import { h, value, compute, hook } from '@rui/core'
 import { Node } from './nodes'
 import { Spine } from '!!val-loader!./spine.js.val'
 

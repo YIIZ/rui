@@ -1,4 +1,4 @@
-import { useRoot } from 'rui'
+import { useRoot } from '@rui/core'
 
 export function useBusy() {
   const root = useRoot()

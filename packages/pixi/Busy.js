@@ -1,11 +1,11 @@
 // @jsx h
 import * as PIXI from 'pixi.js'
-import { h, value, compute, watch } from 'rui'
+import { h, value, compute, watch } from '@rui/core'
 import { Sprite } from './nodes'
 import Closable from './Closable'
 import Spinner from './Spinner'
 import Mask from './Mask'
-import { spring } from '../motion'
+import { spring } from '@rui/browser/motion'
 
 export default function Busy(props) {
   const [count, setCount] = value(0)

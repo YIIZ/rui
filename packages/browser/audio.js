@@ -1,4 +1,4 @@
-import { take, computeWatch } from 'rui'
+import { take, computeWatch } from '@rui/core'
 import { Howl, Howler } from 'howler'
 
 import { pageVisible } from './platform'

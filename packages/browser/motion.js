@@ -1,4 +1,4 @@
-import { take, compute, peek } from 'rui'
+import { take, compute, peek } from '@rui/core'
 // import { interpolate } from 'popmotion'
 import { pageVisible } from './platform'
 

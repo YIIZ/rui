@@ -1,0 +1,8 @@
+{
+  "name": "@rui/pixi",
+  "dependencies": {
+    "@rui/core": "workspace:*",
+    "@rui/browser": "workspace:*",
+    "@rui/html": "workspace:*"
+  }
+}

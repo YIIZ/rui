@@ -1,6 +1,6 @@
 // @jsx h
-import { h, value, compute, hook, if as _if, each, isCompute, apply } from 'rui'
-import { Element } from 'rui/src/html'
+import { h, value, compute, hook, if as _if, each, isCompute, apply } from '@rui/core'
+import { Element } from '@rui/core/src/html'
 import styler from 'stylefire'
 import { spring } from '../motion'
 

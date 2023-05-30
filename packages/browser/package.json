@@ -1,0 +1,7 @@
+{
+  "name": "@rui/browser",
+  "dependencies": {
+    "@rui/core": "workspace:*",
+    "path-browserify": "^1.0.1"
+  }
+}

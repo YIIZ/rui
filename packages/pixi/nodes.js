@@ -1,5 +1,5 @@
 // @jsx h
-import { Node as BaseNode, h, hook, compute, watch, isCompute } from 'rui'
+import { Node as BaseNode, h, hook, compute, watch, isCompute } from '@rui/core'
 
 // TODO treeshaking?
 // import { Container as _Container } from '@pixi/display'
