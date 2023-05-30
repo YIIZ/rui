@@ -3,29 +3,35 @@
   "scripts": {
     "start": "cross-env WEBPACK_DEV_SERVER=1 webpack serve --mode=development",
     "build": "webpack --mode=production --progress",
-    "builddemo": "cross-env DEBUG=1 yarn build",
-    "buildrelease": "cross-env WEBPACK_PUBLIC=https://game.gtimg.cn/images/xxx/a20210101xxx/ yarn build",
-    "package": "yarn buildrelease && pack-it -t ieg -n a20210101xxx ./dist/"
+    "builddemo": "cross-env DEBUG=1 nr build",
+    "buildrelease": "cross-env WEBPACK_PUBLIC=https://game.gtimg.cn/images/xxx/a20210101xxx/ nr build",
+    "package": "nr buildrelease && pack-it -t ieg -n a20210101xxx ./dist/"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.1",
-    "@babel/plugin-transform-runtime": "^7.19.1",
-    "@babel/preset-env": "^7.19.1",
+    "@antfu/ni": "^0.20.0",
+    "@babel/core": "^7.21.3",
+    "@babel/plugin-transform-runtime": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
-    "@babel/runtime": "^7.19.0",
-    "babel-loader": "^8.2.5",
+    "@babel/runtime": "^7.21.0",
+    "babel-loader": "^8.3.0",
     "babel-plugin-transform-jsxspreadchild": "^7.0.0",
-    "core-js": "^3.25.2",
+    "core-js": "^3.29.1",
     "cross-env": "^7.0.3",
     "html-webpack-plugin": "^5.5.0",
-    "val-loader": "^5.0.0",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0",
-    "webpack-dev-server": "^4.11.1"
+    "source-map-loader": "^4.0.1",
+    "val-loader": "^5.0.1",
+    "webpack": "^5.76.1",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.12.0"
   },
   "dependencies": {
-    "lib": "https://github.com/yiiz/lib/archive/2e5d89b.tar.gz",
-    "rui": "https://github.com/yiiz/rui/archive/fc15c3d.tar.gz",
+    "@rui/core": "workspace:*",
+    "@rui/browser": "workspace:*",
+    "@rui/pixi": "workspace:*",
+    "pixi-spine": "^2.1.14",
+    "pixi.js": "^5.3.12",
+    "popmotion": "^11.0.5",
     "whatwg-fetch": "^3.6.2"
   }
 }

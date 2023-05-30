@@ -8,16 +8,17 @@ module.exports = {
   // ignore babelrc in node_modules
   babelrc: false,
   presets: [
-    '@babel/preset-react',
-    ['@babel/preset-env', {
-      modules: false,
-      useBuiltIns: 'usage',
-      corejs: { version: 3, proposals: true },
-      shippedProposals: true,
-      // debug: true,
-    }],
+    "@babel/preset-react",
+    [
+      "@babel/preset-env",
+      {
+        modules: false,
+        useBuiltIns: "usage",
+        corejs: { version: "3.29", proposals: true },
+        shippedProposals: true,
+        // debug: true,
+      },
+    ],
   ],
-  plugins: [
-    'babel-plugin-transform-jsxspreadchild',
-  ],
+  plugins: ["babel-plugin-transform-jsxspreadchild"],
 }

@@ -1,8 +1,13 @@
 {
   "name": "@rui/pixi",
   "dependencies": {
-    "@rui/core": "workspace:*",
     "@rui/browser": "workspace:*",
+    "@rui/core": "workspace:*",
     "@rui/html": "workspace:*"
+  },
+  "peerDependencies": {
+    "pixi.js": "^5",
+    "popmotion": "^9",
+    "val-loader": "*"
   }
 }

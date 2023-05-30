@@ -1,45 +1,106 @@
-import { Deferred } from 'lib/utils'
+// @jsx h
+import { hash, setHash, useAppSize } from "@rui/browser/platform"
+import { route } from "@rui/browser/router"
+import { h, apply, compute, useRoot, value, if as _if } from "@rui/core"
+import { BusyApplication, Container, Sprite } from "@rui/pixi"
+import Spine from "@rui/pixi/Spine"
+import Video from "@rui/pixi/Video"
+import { load } from "@rui/pixi/utils"
+import * as PIXI from "pixi.js"
+import { res, res0 } from "./res"
+import { spring } from "@rui/browser/motion"
 
-import { img, param } from '!!val-loader?b=3!./foo.js.val'
+export const size = useAppSize(750, 1500)
+const { resources } = PIXI.Loader.shared
 
-console.log(img, param)
+function Loading({ loading: { progress, ready }, onNext }) {
+  const go = () => {
+    if (!ready()) return
+    // _track('开始')
+    onNext("movie", null, (enter, leave) => enter.play())
+  }
 
-class Foo {}
-[].every(() => true)
+  const spine = <Spine data={resources.loading.spineData} x={-375} y={-825} />
+  const { state: spineState } = spine.el
 
-const defer = new Deferred
-defer.resolve()
-// defer.promise
-
-const listen = (el, eventName) => new Observable(ob => {
-  const handler = evt => ob.next(evt)
-  el.addEventListener(eventName, handler)
-  return () => el.removeEventListener(eventName, handler)
-})
-
-const take = (source, n) =>
-  new Observable(observer => {
-    let remain = n
-    return source.subscribe({
-      next(value) {
-        remain -= 1
-        if (remain < 1) observer.complete()
-        else observer.next(value)
-      },
-      error(e) {
-        observer.error(e)
-      },
-      complete() {
-        observer.complete()
-      },
-    })
+  apply(() => {
+    ready()
+      ? spineState.setEmptyAnimation(0, 0.1, 0)
+      : spineState.setAnimation(0, "guangbiao", true)
   })
 
-const tenMoves = take(listen(document.body, 'mousemove'), 10)
+  apply(() => {
+    ready()
+      ? spineState.setAnimation(2, "start_enabled", true)
+      : spineState.setAnimation(2, "start_disabled", true)
+  })
 
-tenMoves.subscribe({ next({ x }) { console.log(`move x:${x}`) } })
+  const progressEntry = spineState.setAnimation(1, "jindu", false)
+  progressEntry.timeScale = 0
+  // progressEntry.trackTime = 0.9
+  apply(() => (progressEntry.trackTime = progress()))
 
-const fn = async () => {}
+  return (
+    <Container onpointertap={go}>
+      <Sprite tex={resources.loading_bg.texture} />
+      {spine}
+    </Container>
+  )
+}
 
-console.log('success')
-console.log(Math.clamp(2, 0, 1))
+function App() {
+  const loading = load(
+    res,
+    process.env.NODE_ENV === "development"
+      ? { minDuration: 500 }
+      : { minDuration: 2000 }
+  )
+
+  const [fullPath, setFullPath] =
+    process.env.NODE_ENV === "development" ? [hash, setHash] : value("/")
+
+  const [path, go, subRoute] = route(fullPath, setFullPath)
+  const p = compute(() => {
+    if (!loading.ready()) return "loading"
+    return path() || "loading"
+  })
+
+  const root = useRoot()
+
+  const movie = (
+    <Video
+      src="https://demo.yiz.design/movie.5s.mp4"
+      width={750}
+      height={1500}
+      onEnd={() => {
+        // go("end")
+      }}
+    />
+  )
+  const goMovie = async () => {
+    await root().busy(() => movie.play())
+    go("movie")
+  }
+
+  return (
+    <BusyApplication size={size} options={{ transparent: true }}>
+      {_if(
+        () => p() === "loading",
+        () => (
+          <Loading loading={loading} onNext={goMovie} />
+        )
+      )}
+      {_if(
+        () => p() === "movie",
+        () => (
+          <Container>{movie}</Container>
+        )
+      )}
+    </BusyApplication>
+  )
+}
+
+await load(res0)
+const app = <App></App>
+app.attach()
+document.body.appendChild(app.view)

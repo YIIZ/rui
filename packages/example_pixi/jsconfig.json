@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "jsxFactory": "h",
+    "baseUrl": ".vscode", // disable non-relative imports
+    "paths": {
+      "res/*": ["../res/*"],
+      "@/*": ["../src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist"]
+}

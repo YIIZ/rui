@@ -1,0 +1,447 @@
+
+loading.png
+size: 2048,512
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+CKSCAN/JDT
+  rotate: false
+  xy: 2, 209
+  size: 372, 29
+  orig: 374, 31
+  offset: 1, 1
+  index: -1
+CKSCAN/guangbiao
+  rotate: true
+  xy: 364, 193
+  size: 14, 5
+  orig: 16, 7
+  offset: 1, 1
+  index: -1
+CKSCAN/组 59
+  rotate: false
+  xy: 2, 240
+  size: 545, 250
+  orig: 547, 252
+  offset: 1, 1
+  index: -1
+LOADING/loading/loading_00000
+  rotate: true
+  xy: 376, 64
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00001
+  rotate: true
+  xy: 2, 33
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00002
+  rotate: true
+  xy: 64, 33
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00003
+  rotate: true
+  xy: 126, 33
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00004
+  rotate: false
+  xy: 188, 147
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00005
+  rotate: false
+  xy: 188, 85
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00006
+  rotate: false
+  xy: 188, 23
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00007
+  rotate: false
+  xy: 364, 2
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00008
+  rotate: true
+  xy: 438, 64
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00009
+  rotate: true
+  xy: 500, 64
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00010
+  rotate: false
+  xy: 540, 2
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00011
+  rotate: true
+  xy: 549, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00012
+  rotate: false
+  xy: 549, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00013
+  rotate: true
+  xy: 611, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00014
+  rotate: true
+  xy: 673, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00015
+  rotate: true
+  xy: 562, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00016
+  rotate: true
+  xy: 624, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00017
+  rotate: true
+  xy: 686, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00018
+  rotate: false
+  xy: 725, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00019
+  rotate: false
+  xy: 716, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00020
+  rotate: true
+  xy: 748, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00021
+  rotate: true
+  xy: 810, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00022
+  rotate: true
+  xy: 872, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00023
+  rotate: false
+  xy: 892, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00024
+  rotate: true
+  xy: 735, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00025
+  rotate: true
+  xy: 797, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00026
+  rotate: true
+  xy: 859, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00027
+  rotate: false
+  xy: 901, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00028
+  rotate: true
+  xy: 934, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00029
+  rotate: true
+  xy: 996, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00030
+  rotate: true
+  xy: 1058, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00031
+  rotate: false
+  xy: 1068, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00032
+  rotate: true
+  xy: 921, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00033
+  rotate: true
+  xy: 983, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00034
+  rotate: true
+  xy: 1045, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00035
+  rotate: false
+  xy: 1077, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00036
+  rotate: true
+  xy: 1120, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00037
+  rotate: true
+  xy: 1182, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00038
+  rotate: true
+  xy: 1107, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00039
+  rotate: true
+  xy: 1169, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00040
+  rotate: true
+  xy: 1231, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00041
+  rotate: true
+  xy: 1244, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00042
+  rotate: false
+  xy: 1253, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00043
+  rotate: false
+  xy: 1244, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00044
+  rotate: true
+  xy: 1306, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00045
+  rotate: true
+  xy: 1368, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00046
+  rotate: false
+  xy: 1420, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00047
+  rotate: true
+  xy: 1293, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00048
+  rotate: true
+  xy: 1355, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00049
+  rotate: true
+  xy: 1417, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00050
+  rotate: false
+  xy: 1429, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00051
+  rotate: true
+  xy: 1479, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00052
+  rotate: true
+  xy: 1541, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00053
+  rotate: true
+  xy: 1603, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00054
+  rotate: true
+  xy: 1430, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00055
+  rotate: true
+  xy: 1492, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00056
+  rotate: true
+  xy: 1554, 78
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00057
+  rotate: false
+  xy: 1605, 254
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00058
+  rotate: false
+  xy: 1596, 16
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
+LOADING/loading/loading_00059
+  rotate: true
+  xy: 1665, 316
+  size: 174, 60
+  orig: 750, 1500
+  offset: 470, 639
+  index: -1
