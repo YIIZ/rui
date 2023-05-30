@@ -1,0 +1,20 @@
+const fs = require('fs')
+
+const codePath = `${__dirname}/foo.js.code.txt`
+const code = fs.readFileSync(codePath)
+
+module.exports = ({ b }) => {
+  return {
+    // code: `export default 'hello'`
+    code: `
+import image from 'res/foo.png'
+export const img = image
+export const param = ${b}
+// export * from './bar.js'
+
+${code}
+`,
+    cacheable: true,
+    dependencies: [codePath],
+  }
+}
