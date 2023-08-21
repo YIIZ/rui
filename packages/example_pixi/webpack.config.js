@@ -2,8 +2,8 @@ const path = require("path")
 const webpack = require("webpack")
 const HTMLPlugin = require("html-webpack-plugin")
 
+/** @type {import('webpack').Configuration} */
 module.exports = {
-  context: `${__dirname}/src`,
   resolve: {
     alias: {
       res: `${__dirname}/res`,
@@ -12,11 +12,10 @@ module.exports = {
     },
   },
   entry: {
-    app: "./app.js",
+    app: "./src/app.js",
   },
   output: {
     clean: true,
-    path: `${__dirname}/dist`,
     publicPath: `${process.env.WEBPACK_PUBLIC || ""}`,
     filename: "[name]-[chunkhash:8].js",
     assetModuleFilename: "[name]-[hash][ext]",
@@ -70,9 +69,6 @@ module.exports = {
       template: "index.html.ejs",
     }),
   ],
-  experiments: {
-    topLevelAwait: true,
-  },
   snapshot: {
     // enable node_modules reloading
     managedPaths: [],
