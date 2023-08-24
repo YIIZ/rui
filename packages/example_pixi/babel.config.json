@@ -19,5 +19,5 @@
       },
     ],
   ],
-  "plugins": ["babel-plugin-transform-jsxspreadchild"],
+  "plugins": ["@babel/plugin-transform-runtime", "babel-plugin-transform-jsxspreadchild"],
 }
